@@ -1,8 +1,8 @@
 #pragma once
 #include "../../nclgl/Mesh.h"
 
-#define RAW_WIDTH 257
-#define RAW_HEIGHT 257
+#define RAW_WIDTH 513
+#define RAW_HEIGHT 513
 
 #define HEIGHTMAP_X 16.0f
 #define HEIGHTMAP_Z 16.0f
@@ -20,12 +20,8 @@ public:
 	GLuint getDeptText();
 	void setDeptText(GLuint deptText);
 
-	GLuint getWaterText();
-	void setWaterText(GLuint waterText);
-
 private:
 	GLuint deptText;
 	GLuint terrainText;
-	GLuint waterText;
 };
 

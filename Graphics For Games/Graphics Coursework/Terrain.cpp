@@ -67,13 +67,3 @@ void Terrain::setDeptText(GLuint deptText)
 {
 	this->deptText = deptText;
 }
-
-GLuint Terrain::getWaterText()
-{
-	return waterText;
-}
-
-void Terrain::setWaterText(GLuint waterText)
-{
-	this->waterText = waterText;
-}

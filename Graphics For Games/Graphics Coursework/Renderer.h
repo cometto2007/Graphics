@@ -14,8 +14,22 @@ public:
 
 	void BindTextureToSamplerAndUniform(unsigned int textureUnit, GLuint tex, GLchar* uniformName, Shader* shader);
 protected:
+	Shader* lightShader;
+	Shader* reflectShader;
+	Shader* skyboxShader;
+
 	Camera* camera;
 	Terrain* terrain;
+	Mesh* quad;
+	Light* light;
+
+	GLuint cubeMap;
+
+	float waterRotate;
+
+	void DrawWater();
+	void DrawSkybox();
+	void DrawTerrain();
 };
 
 

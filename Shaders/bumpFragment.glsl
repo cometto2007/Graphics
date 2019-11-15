@@ -15,6 +15,7 @@ in Vertex {
 	vec3 tangent;
 	vec3 binormal;
 	vec3 worldPos;
+	float fragHeight;
 } IN;
 	
 out vec4 fragColour ;

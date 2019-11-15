@@ -91,9 +91,7 @@ void Renderer::DrawWater()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
 
 	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	
 	float heightY = 256 * HEIGHTMAP_Y / 3.0f;
-	
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
 	
 	modelMatrix = Matrix4::Translation(Vector3(heightX, heightY, heightZ)) *
