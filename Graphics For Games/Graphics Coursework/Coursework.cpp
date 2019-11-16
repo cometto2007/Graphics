@@ -1,5 +1,6 @@
 #include "../../nclgl/window.h"
 #include "Renderer.h"
+#include "MousePicker.h"
 
 #pragma comment(lib, "nclgl.lib")
 
@@ -14,34 +15,17 @@ int main() {
 		return -1;
 	}
 
-	w.LockMouseToWindow(false);
+	w.LockMouseToWindow(true);
 	w.ShowOSPointer(false);
 
+	//MousePicker* picker = new MousePicker(renderer.GetCamera(), renderer.GetProjectionMatrix(), renderer.GetTerrain());
+
 	while (w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
-		/*if (Window::GetKeyboard()->KeyDown(KEYBOARD_1)) {
-			Vector2 v = w.GetMouse()->GetAbsolutePosition();
-			GLint viewport[4]; //var to hold the viewport info
-			GLdouble modelview[16]; //var to hold the modelview info
-			GLdouble projection[16]; //var to hold the projection matrix info
-			GLfloat winX, winY, winZ; //variables to hold screen x,y,z coordinates
-			GLdouble worldX, worldY, worldZ; //variables to hold world x,y,z coordinates
-
-			glGetDoublev(GL_MODELVIEW_MATRIX, modelview); //get the modelview info
-			glGetDoublev(GL_PROJECTION_MATRIX, projection); //get the projection matrix info
-			glGetIntegerv(GL_VIEWPORT, viewport); //get the viewport info
-
-			winX = (float)v.x;
-			winY = (float)viewport[3] - (float)v.y;
-			winZ = 0;
-
-			//get the world coordinates from the screen coordinates
-			gluUnProject(winX, winY, winZ, modelview, projection, viewport, &worldX, &worldY, &worldZ);
-			cout << worldX << "\n";
-			cout << worldY << "\n";
-			cout << worldZ << "\n";
-			
-		}*/
 		renderer.UpdateScene(w.GetTimer()->GetTimedMS());
+		//picker->update();
+		//cout << picker->getRay();
+		
+
 		renderer.RenderScene();
 	}
 	return 0;

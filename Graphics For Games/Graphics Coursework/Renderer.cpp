@@ -16,13 +16,20 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	quad->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 	terrain->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 	terrain->SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	terrain->setDeptText(SOIL_load_OGL_texture(TEXTUREDIR"terrain.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	terrain->setDeptText(SOIL_load_OGL_texture(TEXTUREDIR"test.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 
 	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
 		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
 		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
 		SOIL_LOAD_RGB,
 		SOIL_CREATE_NEW_ID, 0);
+
+	/////
+	test = new OBJMesh();
+	test->LoadOBJMesh(MESHDIR"Tree.obj");
+	test->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	SetTextureRepeating(quad->GetTexture(), true);
+	/////
 
 	if (!cubeMap || !quad->GetTexture() || !terrain->GetTexture() || !terrain->GetBumpMap() || !terrain->getDeptText()) {
 		return;
@@ -33,7 +40,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	SetTextureRepeating(terrain->GetBumpMap(), true);
 
 	waterRotate = 0.0f;
-	projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+	projMatrix = Matrix4::Perspective(1.0f, 1000000000000.0f, (float)width / (float)height, 45.0f);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -60,6 +67,13 @@ void Renderer::RenderScene() {
 	DrawSkybox();
 	DrawTerrain();
 	DrawWater();
+	
+	SetCurrentShader(new Shader("SceneVertex.glsl", "SceneFragment.glsl"));
+	BindTextureToSamplerAndUniform(0, terrain->GetTexture(), "diffuseTex", currentShader);
+	modelMatrix = Matrix4::Scale(Vector3(0.0000000000001f, 0.0000000000001f, 0.0000000000001f));
+
+	UpdateShaderMatrices();
+	test->Draw();
 
 	SwapBuffers();
 }
@@ -99,7 +113,7 @@ void Renderer::DrawWater()
 	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
 	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightY = 256 * HEIGHTMAP_Y / 1.0f;
+	float heightY = 1300 * HEIGHTMAP_Y / 2.0f;
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
 
 	modelMatrix = Matrix4::Translation(Vector3(heightX, heightY, heightZ)) *

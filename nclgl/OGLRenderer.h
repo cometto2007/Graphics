@@ -114,6 +114,8 @@ public:
 		return currentShader;
 	}
 
+	Matrix4 GetProjectionMatrix() { return projMatrix; };
+
 protected:
 	void SetShaderLight(const Light& l);
 	virtual void	Resize(int x, int y);	

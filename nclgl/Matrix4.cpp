@@ -20,6 +20,133 @@ void Matrix4::ToIdentity() {
 	values[15] = 1.0f;
 }
 
+Matrix4 Matrix4::Invert()
+{
+	float inv[16], outv[16], det;
+	int i;
+
+	inv[0] = values[5] * values[10] * values[15] -
+		values[5] * values[11] * values[14] -
+		values[9] * values[6] * values[15] +
+		values[9] * values[7] * values[14] +
+		values[13] * values[6] * values[11] -
+		values[13] * values[7] * values[10];
+
+	inv[4] = -values[4] * values[10] * values[15] +
+		values[4] * values[11] * values[14] +
+		values[8] * values[6] * values[15] -
+		values[8] * values[7] * values[14] -
+		values[12] * values[6] * values[11] +
+		values[12] * values[7] * values[10];
+
+	inv[8] = values[4] * values[9] * values[15] -
+		values[4] * values[11] * values[13] -
+		values[8] * values[5] * values[15] +
+		values[8] * values[7] * values[13] +
+		values[12] * values[5] * values[11] -
+		values[12] * values[7] * values[9];
+
+	inv[12] = -values[4] * values[9] * values[14] +
+		values[4] * values[10] * values[13] +
+		values[8] * values[5] * values[14] -
+		values[8] * values[6] * values[13] -
+		values[12] * values[5] * values[10] +
+		values[12] * values[6] * values[9];
+
+	inv[1] = -values[1] * values[10] * values[15] +
+		values[1] * values[11] * values[14] +
+		values[9] * values[2] * values[15] -
+		values[9] * values[3] * values[14] -
+		values[13] * values[2] * values[11] +
+		values[13] * values[3] * values[10];
+
+	inv[5] = values[0] * values[10] * values[15] -
+		values[0] * values[11] * values[14] -
+		values[8] * values[2] * values[15] +
+		values[8] * values[3] * values[14] +
+		values[12] * values[2] * values[11] -
+		values[12] * values[3] * values[10];
+
+	inv[9] = -values[0] * values[9] * values[15] +
+		values[0] * values[11] * values[13] +
+		values[8] * values[1] * values[15] -
+		values[8] * values[3] * values[13] -
+		values[12] * values[1] * values[11] +
+		values[12] * values[3] * values[9];
+
+	inv[13] = values[0] * values[9] * values[14] -
+		values[0] * values[10] * values[13] -
+		values[8] * values[1] * values[14] +
+		values[8] * values[2] * values[13] +
+		values[12] * values[1] * values[10] -
+		values[12] * values[2] * values[9];
+
+	inv[2] = values[1] * values[6] * values[15] -
+		values[1] * values[7] * values[14] -
+		values[5] * values[2] * values[15] +
+		values[5] * values[3] * values[14] +
+		values[13] * values[2] * values[7] -
+		values[13] * values[3] * values[6];
+
+	inv[6] = -values[0] * values[6] * values[15] +
+		values[0] * values[7] * values[14] +
+		values[4] * values[2] * values[15] -
+		values[4] * values[3] * values[14] -
+		values[12] * values[2] * values[7] +
+		values[12] * values[3] * values[6];
+
+	inv[10] = values[0] * values[5] * values[15] -
+		values[0] * values[7] * values[13] -
+		values[4] * values[1] * values[15] +
+		values[4] * values[3] * values[13] +
+		values[12] * values[1] * values[7] -
+		values[12] * values[3] * values[5];
+
+	inv[14] = -values[0] * values[5] * values[14] +
+		values[0] * values[6] * values[13] +
+		values[4] * values[1] * values[14] -
+		values[4] * values[2] * values[13] -
+		values[12] * values[1] * values[6] +
+		values[12] * values[2] * values[5];
+
+	inv[3] = -values[1] * values[6] * values[11] +
+		values[1] * values[7] * values[10] +
+		values[5] * values[2] * values[11] -
+		values[5] * values[3] * values[10] -
+		values[9] * values[2] * values[7] +
+		values[9] * values[3] * values[6];
+
+	inv[7] = values[0] * values[6] * values[11] -
+		values[0] * values[7] * values[10] -
+		values[4] * values[2] * values[11] +
+		values[4] * values[3] * values[10] +
+		values[8] * values[2] * values[7] -
+		values[8] * values[3] * values[6];
+
+	inv[11] = -values[0] * values[5] * values[11] +
+		values[0] * values[7] * values[9] +
+		values[4] * values[1] * values[11] -
+		values[4] * values[3] * values[9] -
+		values[8] * values[1] * values[7] +
+		values[8] * values[3] * values[5];
+
+	inv[15] = values[0] * values[5] * values[10] -
+		values[0] * values[6] * values[9] -
+		values[4] * values[1] * values[10] +
+		values[4] * values[2] * values[9] +
+		values[8] * values[1] * values[6] -
+		values[8] * values[2] * values[5];
+
+	det = values[0] * inv[0] + values[1] * inv[4] + values[2] * inv[8] + values[3] * inv[12];
+
+	det = 1.0 / det;
+
+	for (i = 0; i < 16; i++)
+		outv[i] = inv[i] * det;
+
+	return Matrix4(outv);
+}
+
 void Matrix4::ToZero()	{
 	for(int i = 0; i < 16; i++)	{
 		values[i] = 0.0f;

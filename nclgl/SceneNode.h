@@ -20,6 +20,9 @@ public:
 	Vector3 GetModelScale() const { return modelScale; }
 	void SetModelScale(Vector3 s) { modelScale = s; }
 
+	Shader* GetShader() const { return shader; }
+	void SetShader(Shader* s) { shader = s; }
+
 	Mesh* GetMesh() const { return mesh; }
 	void SetMesh(Mesh* m) { mesh = m; }
 
@@ -48,6 +51,7 @@ protected:
 	Matrix4 transform;
 	Vector3 modelScale;
 	Vector4 colour;
+	Shader* shader;
 	std::vector<SceneNode*> children;
 
 	float distanceFromCamera;

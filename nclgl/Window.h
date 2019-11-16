@@ -43,6 +43,7 @@ public:
 	Vector2	GetScreenSize() {return size;};
 
 	static Keyboard*	GetKeyboard()	{return keyboard;}
+	static Window* GetWindow() { return window; }
 	static Mouse*		GetMouse()		{return mouse;}
 
 	GameTimer*   GetTimer()		{return timer;}

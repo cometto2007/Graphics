@@ -24,4 +24,3 @@ private:
 	GLuint deptText;
 	GLuint terrainText;
 };
-
