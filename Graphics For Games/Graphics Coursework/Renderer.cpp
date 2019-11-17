@@ -34,7 +34,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	test = new OBJMesh();
 	test->LoadOBJMesh(MESHDIR"Tree.obj");
 	test->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	SetTextureRepeating(quad->GetTexture(), true);
+	SetTextureRepeating(test->GetTexture(), true);
 	/////
 
 	if (!cubeMap || !quad->GetTexture() || !terrain->GetTexture() || !terrain->GetBumpMap() || !terrain->getDeptText()) {
@@ -75,8 +75,7 @@ void Renderer::RenderScene() {
 	DrawWater();
 	
 	SetCurrentShader(testShader);
-	BindTextureToSamplerAndUniform(0, terrain->GetTexture(), "diffuseTex", currentShader);
-	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
+	BindTextureToSamplerAndUniform(0, test->GetTexture(), "diffuseTex", currentShader);
 
 	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
 	float heightY = 1300 * HEIGHTMAP_Y / 2.0f;

@@ -12,7 +12,7 @@ how large a textmesh will be when scaled etc
 TextMesh::TextMesh(const std::string &text, const Font &font) :  font(font)	{
 	//Set our Mesh to have the font's texture, containing all of the
 	//individual characters we need.
-	SetTexture(font.texture);
+	setTexture(font.texture);
 
 	//Each quad will be 4 points, drawn using a triangle strip
 	//just like the GenerateQuad function from early on!
