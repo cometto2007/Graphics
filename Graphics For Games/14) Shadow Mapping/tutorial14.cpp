@@ -14,7 +14,7 @@ int main() {
 		return -1;
 	}
 
-	w.LockMouseToWindow(true);
+	w.LockMouseToWindow(false);
 	w.ShowOSPointer(false);
 
 	while(w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)){

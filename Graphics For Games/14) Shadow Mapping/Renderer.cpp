@@ -4,14 +4,14 @@ Renderer::Renderer(Window & parent) : OGLRenderer(parent) {
 	camera = new Camera(-8.0f, 40.0f, Vector3(-200.0f, 50.0f, 250.0f));
 	light = new Light(Vector3(-450.0f, 200.0f, 280.0f), Vector4(1, 1, 1, 1), 5500.0f);
 	
-	hellData = new MD5FileData(MESHDIR "hellknight.md5mesh");
+	hellData = new MD5FileData(MESHDIR"hellknight.md5mesh");
 	hellNode = new MD5Node(*hellData);
 	
-	hellData->AddAnim(MESHDIR "idle2.md5anim");
-	hellNode->PlayAnim(MESHDIR "idle2.md5anim");
+	hellData->AddAnim(MESHDIR"idle2.md5anim");
+	hellNode->PlayAnim(MESHDIR"idle2.md5anim");
 	
-	sceneShader = new Shader(SHADERDIR "shadowscenevert.glsl", SHADERDIR "shadowscenefrag.glsl");
-	shadowShader = new Shader(SHADERDIR "shadowVert.glsl ", SHADERDIR "shadowFrag.glsl");
+	sceneShader = new Shader(SHADERDIR"shadowscenevert.glsl", SHADERDIR"shadowscenefrag.glsl");
+	shadowShader = new Shader(SHADERDIR"shadowVert.glsl", SHADERDIR"shadowFrag.glsl");
 	
 	if (!sceneShader->LinkProgram() || !shadowShader->LinkProgram()) {
 		return;
@@ -37,8 +37,8 @@ Renderer::Renderer(Window & parent) : OGLRenderer(parent) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	floor = Mesh::GenerateQuad();
-	floor->setTexture(SOIL_load_OGL_texture(TEXTUREDIR "brick.tga", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	floor->SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR "brickDOT3.tga", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	floor->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"brick.tga", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	floor->SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"brickDOT3.tga", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 	glEnable(GL_DEPTH_TEST);
 	
 	projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);
