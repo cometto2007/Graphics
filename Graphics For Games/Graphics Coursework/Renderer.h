@@ -21,6 +21,7 @@ protected:
 	Shader* lightShader;
 	Shader* reflectShader;
 	Shader* skyboxShader;
+	Shader* testShader;
 
 	OBJMesh* test;
 
