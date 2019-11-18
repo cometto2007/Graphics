@@ -2,6 +2,10 @@
 
 uniform sampler2D diffuseTex;
 uniform sampler2D bumpTex;
+uniform sampler2D grassTex;
+uniform sampler2D sandTex;
+uniform sampler2D sandWetTex;
+uniform sampler2D cliffsTex;
 
 uniform vec3 cameraPos;
 uniform vec4 lightColour;
@@ -15,6 +19,10 @@ in Vertex {
 	vec3 tangent;
 	vec3 binormal;
 	vec3 worldPos;
+	float isGrass;
+	float isSand;
+	float isWetSand;
+	float isCliffs;
 	float fragHeight;
 } IN;
 	
@@ -22,6 +30,10 @@ out vec4 fragColour ;
 
 void main(void) {
 	vec4 diffuse = texture(diffuseTex , IN.texCoord);
+	vec4 grass = texture(grassTex , IN.texCoord);
+	vec4 sand = texture(sandTex , IN.texCoord);
+	vec4 wetSand = texture(sandWetTex , IN.texCoord);
+	vec4 cliffs = texture(cliffsTex , IN.texCoord);
 	
 	mat3 TBN = mat3(IN.tangent, IN.binormal, IN.normal);
 	
@@ -38,8 +50,26 @@ void main(void) {
 	float rFactor = max(0.0, dot(halfDir, normal));
 	float sFactor = pow(rFactor, 33.0);
 	
-	vec3 colour = (diffuse.rgb * lightColour.rgb);
-	colour += (lightColour.rgb * sFactor) * 0.33;
-	fragColour = vec4(colour * atten * lambert, diffuse.a);
-	fragColour.rgb += (diffuse.rgb * lightColour.rgb) * 0.1;
+	vec3 colour = (lightColour.rgb * sFactor) * 0.33;
+	if (IN.isGrass > 0.5f) {
+		colour += (grass.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, grass.a);
+		fragColour.rgb += (grass.rgb * lightColour.rgb) * 0.1;
+	} else if (IN.isSand > 0.5f) {
+		colour += (sand.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, sand.a);
+		fragColour.rgb += (sand.rgb * lightColour.rgb) * 0.1;
+	} else if (IN.isWetSand > 0.5f) {
+		colour += (wetSand.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, wetSand.a);
+		fragColour.rgb += (wetSand.rgb * lightColour.rgb) * 0.1;
+	} else if (IN.isCliffs > 0.5f) {
+		colour += (cliffs.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, cliffs.a);
+		fragColour.rgb += (cliffs.rgb * lightColour.rgb) * 0.1;
+	} else {
+		colour = (diffuse.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, diffuse.a);
+		fragColour.rgb += (diffuse.rgb * lightColour.rgb) * 0.1;
+	}
 }

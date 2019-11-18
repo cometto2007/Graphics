@@ -9,21 +9,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	reflectShader = new Shader(SHADERDIR"PerPixelVertex.glsl", SHADERDIR "reflectFragment.glsl");
 	skyboxShader = new Shader(SHADERDIR "skyboxVertex.glsl", SHADERDIR "skyboxFragment.glsl");
 	lightShader = new Shader(SHADERDIR "bumpVertex.glsl", SHADERDIR "bumpFragment.glsl");
-
-	//////
-	testShader = new Shader(SHADERDIR"BVertex.glsl", SHADERDIR"BFragment.glsl");
-	if (!testShader->LinkProgram()) {
-		return;
-	}
-
-	tree = new Tree(0.01f, 5.0f, 1.0f);
-	tree->getMesh()->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	tree->getMesh()->SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-
-
-	SetTextureRepeating(tree->GetTexture(), true);
-	///////
-
+	testShader = new Shader(SHADERDIR "BVertex.glsl", SHADERDIR "BFragment.glsl");
 
 	//
 	OBJMesh* mesh = new OBJMesh();
@@ -47,7 +33,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	root->AddChild(tree);
 	//
 
-	if (!reflectShader->LinkProgram() || !skyboxShader->LinkProgram() || !lightShader->LinkProgram()) {
+	if (!reflectShader->LinkProgram() || !skyboxShader->LinkProgram() || !lightShader->LinkProgram() || !testShader->LinkProgram()) {
 		return;
 	}
 	quad->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
@@ -65,6 +51,9 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	SetTextureRepeating(terrain->GetTexture(), true);
 	SetTextureRepeating(terrain->GetBumpMap(), true);
 	SetTextureRepeating(terrain->getGrassText(), true);
+	SetTextureRepeating(terrain->getCliffsText(), true);
+	SetTextureRepeating(terrain->getSandText(), true);
+	SetTextureRepeating(terrain->getSandText(), true);
 
 	waterRotate = 0.0f;
 	projMatrix = Matrix4::Perspective(1.0f, 10000000.0f, (float)width / (float)height, 45.0f);
@@ -95,7 +84,7 @@ void Renderer::RenderScene() {
 	DrawTerrain();
 	DrawWater();
 	
-	testMethod();
+	//testMethod();
 
 	SwapBuffers();
 }
@@ -105,7 +94,7 @@ void Renderer::UpdateScene(float msec) {
 	viewMatrix = camera->BuildViewMatrix();
 	waterRotate += msec / 1000.0f;
 	//
-	root->Update(msec);
+	//root->Update(msec);
 	//
 }
 
@@ -119,9 +108,15 @@ void Renderer::DrawTerrain()
 	glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
 	BindTextureToSamplerAndUniform(0, terrain->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
 	BindTextureToSamplerAndUniform(1, terrain->GetBumpMap(), "bumpTex", currentShader, GL_TEXTURE_2D);
-	BindTextureToSamplerAndUniform(2, terrain->getDeptText(), "deptTex", currentShader, GL_TEXTURE_2D);
-	BindTextureToSamplerAndUniform(3, terrain->getGrassText(), "grassTex", currentShader, GL_TEXTURE_2D);
-	BindTextureToSamplerAndUniform(4, terrain->getBlendMap(), "blendMap", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(2, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(3, terrain->getGrassMap(), "grassMap", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(4, terrain->getSandMap(), "sandMap", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(5, terrain->getSandWetMap(), "sandWetMap", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(6, terrain->getCliffsMap(), "cliffsMap", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(7, terrain->getGrassText(), "grassTex", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(8, terrain->getSandText(), "sandTex", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(9, terrain->getSandWetText(), "sandWetTex", currentShader, GL_TEXTURE_2D);
+	BindTextureToSamplerAndUniform(10, terrain->getCliffsText(), "cliffsTex", currentShader, GL_TEXTURE_2D);
 
 	modelMatrix.ToIdentity();
 	textureMatrix.ToIdentity();
@@ -201,7 +196,7 @@ void Renderer::DrawNode(SceneNode* n)
 			modelMatrix = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
 			UpdateShaderMatrices();
 			BindTextureToSamplerAndUniform(0, tree->getMesh()->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
-			BindTextureToSamplerAndUniform(5, terrain->getDeptText(), "deptTex", currentShader, GL_TEXTURE_2D);
+			BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
 			glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
 
 			n->Draw(*this);

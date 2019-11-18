@@ -40,20 +40,36 @@ Terrain::Terrain(float speed, float maxHeight, float currentHeight) : GrowingMes
 
 	BufferData();
 
-	setTexture(SOIL_load_OGL_texture(TEXTUREDIR"TexturesCom_Grass0130_1_seamless_S.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	setGrassText(SOIL_load_OGL_texture(TEXTUREDIR"TexturesCom_Grass0130_1_seamless_S.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	// Set Texture
+	setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setGrassText(SOIL_load_OGL_texture(TEXTUREDIR"grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setCliffsText(SOIL_load_OGL_texture(TEXTUREDIR"cliffs.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setSandWetText(SOIL_load_OGL_texture(TEXTUREDIR"sandWet.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setSandText(SOIL_load_OGL_texture(TEXTUREDIR"sand.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 	SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	setDeptText(SOIL_load_OGL_texture(TEXTUREDIR"canyonIsland_heightmap_little.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	setBlendMap(SOIL_load_OGL_texture(TEXTUREDIR"BlendMap.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	
 
-	if (GetTexture() || GetBumpMap() || getDeptText() || getGrassText() || getBlendMap()) {
+	// Set Map
+	setDeptMap(SOIL_load_OGL_texture(TEXTUREDIR"canyonIsland_heightmap_little.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setGrassMap(SOIL_load_OGL_texture(TEXTUREDIR"CI_Shared_Grass_01.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setCliffsMap(SOIL_load_OGL_texture(TEXTUREDIR"CI_Shared_Cliffs_01.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setSandWetMap(SOIL_load_OGL_texture(TEXTUREDIR"CI_Beach_Sands_Wet.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setSandMap(SOIL_load_OGL_texture(TEXTUREDIR"CI_Beach_Sands_02.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	
+
+	if (!GetTexture() || !getGrassText() || !getCliffsText() || !getSandWetText() || !getSandText() || !GetBumpMap()) {
 		return;
 	}
+
+	if (!getDeptMap() || !getGrassMap() || !getCliffsMap() || !getSandWetMap() || !getSandMap()) {
+		return;
+	}
+
 }
 
 Terrain::~Terrain()
 {
-	glDeleteTextures(1, &deptText);
+	glDeleteTextures(1, &deptMap);
 }
 
 void Terrain::Draw()
@@ -68,32 +84,3 @@ void Terrain::Draw()
 	glBindVertexArray(0);
 }
 
-GLuint Terrain::getDeptText()
-{
-	return deptText;
-}
-
-void Terrain::setDeptText(GLuint deptText)
-{
-	this->deptText = deptText;
-}
-
-void Terrain::setGrassText(GLuint grassText)
-{
-	this->grassText = grassText;
-}
-
-GLuint Terrain::getBlendMap()
-{
-	return blendMap;
-}
-
-void Terrain::setBlendMap(GLuint blendMap)
-{
-	this->blendMap = blendMap;
-}
-
-GLuint Terrain::getGrassText()
-{
-	return grassText;
-}
