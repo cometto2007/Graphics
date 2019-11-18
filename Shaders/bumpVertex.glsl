@@ -4,6 +4,8 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 uniform mat4 textureMatrix;
 
+uniform float height;
+
 uniform sampler2D deptTex;
 
 in vec3 position;
@@ -36,5 +38,5 @@ void main(void) {
 	
 	OUT.worldPos = (modelMatrix * vec4(position ,1)).xyz;
 	
-	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, texel.r * 2000, position.z, 1.0);
+	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, texel.r * height, position.z, 1.0);
 }

@@ -15,11 +15,13 @@
     <ClCompile Include="MousePicker.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MousePicker.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="Tree.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{909A2CFC-6E55-4776-8B60-93B44103A9CF}</ProjectGuid>

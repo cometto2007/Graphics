@@ -1,6 +1,6 @@
 #include "Terrain.h"
 
-Terrain::Terrain()
+Terrain::Terrain(float speed, float maxHeight, float currentHeight) : GrowingMesh(speed, maxHeight, currentHeight)
 {
 	numVertices = RAW_WIDTH * RAW_HEIGHT;
 	numIndices = (RAW_WIDTH - 1) * (RAW_HEIGHT - 1) * 6;
@@ -39,6 +39,16 @@ Terrain::Terrain()
 	GenerateTangents();
 
 	BufferData();
+
+	setTexture(SOIL_load_OGL_texture(TEXTUREDIR"TexturesCom_Grass0130_1_seamless_S.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setGrassText(SOIL_load_OGL_texture(TEXTUREDIR"TexturesCom_Grass0130_1_seamless_S.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setDeptText(SOIL_load_OGL_texture(TEXTUREDIR"canyonIsland_heightmap_little.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	setBlendMap(SOIL_load_OGL_texture(TEXTUREDIR"BlendMap.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+
+	if (GetTexture() || GetBumpMap() || getDeptText() || getGrassText() || getBlendMap()) {
+		return;
+	}
 }
 
 Terrain::~Terrain()
@@ -66,4 +76,24 @@ GLuint Terrain::getDeptText()
 void Terrain::setDeptText(GLuint deptText)
 {
 	this->deptText = deptText;
+}
+
+void Terrain::setGrassText(GLuint grassText)
+{
+	this->grassText = grassText;
+}
+
+GLuint Terrain::getBlendMap()
+{
+	return blendMap;
+}
+
+void Terrain::setBlendMap(GLuint blendMap)
+{
+	this->blendMap = blendMap;
+}
+
+GLuint Terrain::getGrassText()
+{
+	return grassText;
 }
