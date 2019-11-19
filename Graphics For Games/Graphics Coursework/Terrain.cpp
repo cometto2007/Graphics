@@ -72,6 +72,8 @@ Terrain::~Terrain()
 	glDeleteTextures(1, &deptMap);
 }
 
+
+
 void Terrain::Draw()
 {
 	glBindVertexArray(arrayObject);
@@ -83,4 +85,3 @@ void Terrain::Draw()
 	}
 	glBindVertexArray(0);
 }
-

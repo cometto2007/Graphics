@@ -34,37 +34,32 @@ out Vertex {
 
 void main(void) {
 	mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
-	vec4 texel = texture(deptTex, position.xz / (16.0 * 513));
-	if (texture(grassMap, position.xz / (16.0 * 513)).w == 1){
+	vec4 texel = texture(deptTex, position.xz / (32.0 * 513));
+	if (texture(grassMap, position.xz / (32.0 * 513)).r > 0.1){
 		OUT.isGrass = 1.0f;
 	} else {
 		OUT.isGrass = 0.0f;
 	}
-	if (texture(sandMap, position.xz / (16.0 * 513)).w == 1){
+	if (texture(sandMap, position.xz / (32.0 * 513)).r > 0.1){
 		OUT.isSand = 1.0f;
 	} else {
 		OUT.isSand = 0.0f;
 	}
-	if (texture(sandWetMap, position.xz / (16.0 * 513)).w == 1){
+	if (texture(sandWetMap, position.xz / (32.0 * 513)).r > 0.1){
 		OUT.isWetSand = 1.0f;
 	} else {
 		OUT.isWetSand = 0.0f;
 	}
-	if (texture(cliffsMap, position.xz / (16.0 * 513)).w == 1){
+	if (texture(cliffsMap, position.xz / (32.0 * 513)).r > 0.1){
 		OUT.isCliffs = 1.0f;
 	} else {
 		OUT.isCliffs = 0.0f;
 	}
 
-	//OUT.isGrass = 1.0f;
-	//OUT.isSand = 1.0f;
-	//OUT.isWetSand = 1.0f;
-	//OUT.isCliffs = 1.0f;
-
 	OUT.fragHeight = texel.r * 1000;
 	
 	OUT.colour = colour;
-	OUT.texCoord = (textureMatrix * vec4 (texCoord, 0.0, 1.0)).xy;
+	OUT.texCoord = (textureMatrix * vec4 (texCoord * 2, 0.0, 1.0)).xy;
 	
 	OUT.normal = normalize(normalMatrix * normalize(normal));
 	OUT.tangent = normalize(normalMatrix * normalize(tangent));

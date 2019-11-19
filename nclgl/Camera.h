@@ -17,17 +17,45 @@ _-_-_-_-_-_-_-""  ""
 #include "Matrix4.h"
 #include "Vector3.h"
 
+#define SPEED 2.0f
+
+struct CameraData {
+	float pitch;
+	float yaw;
+	Vector3 position;
+};
+
 class Camera	{
 public:
 	Camera(void){
 		yaw		= 0.0f;
 		pitch	= 0.0f;
+		cameraConfsIndex = -1;
+		countFrame = 1;
+		speed = SPEED;
+		autoMov = false;
 	};
+
+	Camera(CameraData data) {
+		this->pitch = data.pitch;
+		this->yaw = data.yaw;
+		this->position = data.position;
+
+		cameraConfsIndex = -1;
+		countFrame = 1;
+		speed = SPEED;
+		autoMov = false;
+	}
 
 	Camera(float pitch, float yaw, Vector3 position){
 		this->pitch		= pitch;
 		this->yaw		= yaw;
 		this->position	= position;
+
+		cameraConfsIndex = -1;
+		countFrame = 1;
+		speed = SPEED;
+		autoMov = false;
 	}
 
 	~Camera(void){};
@@ -53,8 +81,40 @@ public:
 	//Sets pitch, in degrees
 	void	SetPitch(float p) {pitch = p;}
 
+	void setData(CameraData data) {
+		this->pitch = data.pitch;
+		this->yaw = data.yaw;
+		this->position = data.position;
+	}
+
+	void addCameraConf(CameraData cd) { cameraConfs.push_back(cd); };
+	void incrCameraIndex() { cameraConfsIndex++; };
+	void setCameraIndex(int index) { 
+		if (index <= cameraConfs.size() - 1) {
+			cameraConfsIndex = index;
+			setData(cameraConfs[index]);
+		}
+	};
+	int getCameraIndex() { return cameraConfsIndex; };
+	void setCameraSpeed(int speed) { this->speed = speed; };
+
+	void moveCameraAuto(float msec);
+	void setAutoCam(bool autoMov) { this->autoMov = autoMov; }
+
+	void printData() {
+		cout << "yaw: " << yaw << endl;
+		cout << "pitch: " << pitch << endl;
+		cout << "position: " << position << endl;
+	}
+
 protected:
 	float	yaw;
 	float	pitch;
 	Vector3 position;
+
+	vector<CameraData> cameraConfs;
+	int cameraConfsIndex;
+	int countFrame;
+	float speed;
+	bool autoMov;
 };

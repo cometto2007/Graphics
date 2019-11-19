@@ -30,6 +30,10 @@ public:
 		children.push_back(m);
 	}
 
+	std::vector<Mesh*> ChildMeshInterface::getChilds() {
+		return children;
+	}
+
 	virtual ~ChildMeshInterface() {
 		for(unsigned int i = 0; i < children.size(); ++i) {
 			delete children.at(i);

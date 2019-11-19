@@ -33,7 +33,7 @@ void main(void) {
 	vec4 grass = texture(grassTex , IN.texCoord);
 	vec4 sand = texture(sandTex , IN.texCoord);
 	vec4 wetSand = texture(sandWetTex , IN.texCoord);
-	vec4 cliffs = texture(cliffsTex , IN.texCoord);
+	vec4 cliffs = texture(cliffsTex, IN.texCoord);
 	
 	mat3 TBN = mat3(IN.tangent, IN.binormal, IN.normal);
 	
@@ -51,10 +51,10 @@ void main(void) {
 	float sFactor = pow(rFactor, 33.0);
 	
 	vec3 colour = (lightColour.rgb * sFactor) * 0.33;
-	if (IN.isGrass > 0.5f) {
-		colour += (grass.rgb * lightColour.rgb);
-		fragColour = vec4(colour * atten * lambert, grass.a);
-		fragColour.rgb += (grass.rgb * lightColour.rgb) * 0.1;
+	if (IN.isCliffs > 0.5f) {
+		colour += (cliffs.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, cliffs.a);
+		fragColour.rgb += (cliffs.rgb * lightColour.rgb) * 0.1;
 	} else if (IN.isSand > 0.5f) {
 		colour += (sand.rgb * lightColour.rgb);
 		fragColour = vec4(colour * atten * lambert, sand.a);
@@ -63,10 +63,10 @@ void main(void) {
 		colour += (wetSand.rgb * lightColour.rgb);
 		fragColour = vec4(colour * atten * lambert, wetSand.a);
 		fragColour.rgb += (wetSand.rgb * lightColour.rgb) * 0.1;
-	} else if (IN.isCliffs > 0.5f) {
-		colour += (cliffs.rgb * lightColour.rgb);
-		fragColour = vec4(colour * atten * lambert, cliffs.a);
-		fragColour.rgb += (cliffs.rgb * lightColour.rgb) * 0.1;
+	} else if (IN.isGrass > 0.5f) {
+		colour += (grass.rgb * lightColour.rgb);
+		fragColour = vec4(colour * atten * lambert, grass.a);
+		fragColour.rgb += (grass.rgb * lightColour.rgb) * 0.1;
 	} else {
 		colour = (diffuse.rgb * lightColour.rgb);
 		fragColour = vec4(colour * atten * lambert, diffuse.a);

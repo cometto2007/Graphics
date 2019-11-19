@@ -3,8 +3,9 @@
 #include "../../nclgl/Camera.h"
 #include "../../nclgl/SceneNode.h"
 #include "../../nclgl/OBJMesh.h"
+#include <stdlib.h>
 #include "Terrain.h"
-#include "Tree.h"
+#include "MousePicker.h"
 
 class Renderer : public OGLRenderer {
 public:
@@ -18,14 +19,18 @@ public:
 	Camera* GetCamera() { return camera; };
 	Terrain* GetTerrain() { return terrain; };
 
+	void setMousePicker(MousePicker* mp) { this->mp = mp; };
+	void setCameraConfsIndex(int i) { camera->setCameraIndex(i); };
+	void setCameraAuto(bool b) { camera->setAutoCam(b); };
+
 	void testMethod();
 protected:
+	MousePicker* mp;
+
 	Shader* lightShader;
 	Shader* reflectShader;
 	Shader* skyboxShader;
 	Shader* testShader;
-
-	Tree* tree;
 
 	Camera* camera;
 	Terrain* terrain;
@@ -43,6 +48,8 @@ protected:
 	void DrawTerrain();
 
 	void DrawNode(SceneNode* n);
+	void configureScene();
+	float RandomFloat(float a, float b);
 };
 
 

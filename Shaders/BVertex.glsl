@@ -16,7 +16,7 @@ out Vertex {
 
 void main(void) {
 	vec4 temp = modelMatrix * vec4(0,0,0,1);
-	vec4 texel = texture(deptTex, temp.xz / (16.0 * 513));
-	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, position.y + (height * texel.r) - 1000, position.z, 1.0);
+	vec4 texel = texture(deptTex, temp.xz / (32.0f * 513.0f));
+	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, position.y + (height * texel.r), position.z, 1.0);
 	OUT.texCoord = texCoord;
 }

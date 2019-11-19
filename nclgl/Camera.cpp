@@ -59,3 +59,35 @@ Matrix4 Camera::BuildViewMatrix()	{
 			Matrix4::Rotation(-yaw, Vector3(0,1,0)) * 
 			Matrix4::Translation(-position);
 };
+
+void Camera::moveCameraAuto(float msec)
+{
+	// TODO: add modularity for all the points
+	if (autoMov) {
+		CameraData cd1 = cameraConfs[cameraConfsIndex];
+		CameraData cd2 = cameraConfs[cameraConfsIndex + 1];
+		CameraData pos;
+		float distance = (cd1.position - cd2.position).Length();
+		float time = distance / speed;
+		int cameraStopPoint = floor(time / msec);
+
+		if (countFrame < cameraStopPoint) {
+			float t = (1.0f / (float)cameraStopPoint) * (float)countFrame;
+			pos.position.x = (t * cd2.position.x) + ((1 - t) * cd1.position.x);
+			pos.position.y = (t * cd2.position.y) + ((1 - t) * cd1.position.y);
+			pos.position.z = (t * cd2.position.z) + ((1 - t) * cd1.position.z);
+			pos.pitch = (t * cd2.pitch) + ((1 - t) * cd1.pitch);
+			pos.yaw = (t * cd2.yaw) + ((1 - t) * cd1.yaw);
+
+			countFrame++;
+			setData(pos);
+		} else {
+			if ((cameraConfsIndex + 1) <= (cameraConfs.size() - 2)) {
+				cameraConfsIndex++;
+			} else {
+				autoMov = false;
+			}
+			countFrame = 0;
+		}
+	}
+}

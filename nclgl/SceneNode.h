@@ -4,10 +4,11 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Mesh.h"
+#include "OBJMesh.h"
 
 class SceneNode {
 public:
-	SceneNode(Mesh* m = nullptr, Vector4 colour = Vector4(1, 1, 1, 1));
+	SceneNode(Mesh* m = nullptr, Vector4 colour = Vector4(1, 1, 1, 1), OBJMesh * mesh = nullptr);
 	~SceneNode(void);
 
 	void SetTransform(const Matrix4& matrix) { transform = matrix; }
@@ -25,6 +26,9 @@ public:
 
 	Mesh* GetMesh() const { return mesh; }
 	void SetMesh(Mesh* m) { mesh = m; }
+
+	Mesh* getObjMesh() const { return objMesh; }
+	void setObjMesh(OBJMesh* m) { objMesh = m; }
 
 	float GetBoundingRadius() const { return boundingRadius; }
 	void SetBoundingRadius(float f) { boundingRadius = f; }
@@ -47,6 +51,7 @@ public:
 protected:
 	SceneNode* parent;
 	Mesh* mesh;
+	OBJMesh* objMesh;
 	Matrix4 worldTransform;
 	Matrix4 transform;
 	Vector3 modelScale;

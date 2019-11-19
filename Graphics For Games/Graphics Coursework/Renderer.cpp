@@ -1,8 +1,13 @@
 #include "Renderer.h"
 
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
-	terrain = new Terrain(2.0f, 2000.0f, 800.f);
-	camera = new Camera(-40, 270, Vector3(-2100, 3300, 2000));
+	terrain = new Terrain(2.0f, 2000.0f, 2000.f);
+
+	camera = new Camera({ -40, 270, Vector3(-2100, 3300, 2000) });
+	camera->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
+	camera->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
+	camera->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
+
 	quad = Mesh::GenerateQuad();
 	light = new Light(Vector3((RAW_HEIGHT * HEIGHTMAP_X / 2.0f), 500.0f, (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f)), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 1.0f);
 
@@ -11,33 +16,12 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	lightShader = new Shader(SHADERDIR "bumpVertex.glsl", SHADERDIR "bumpFragment.glsl");
 	testShader = new Shader(SHADERDIR "BVertex.glsl", SHADERDIR "BFragment.glsl");
 
-	//
-	OBJMesh* mesh = new OBJMesh();
-	mesh->LoadOBJMesh(MESHDIR"Tree.obj");
-	mesh->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	SetTextureRepeating(mesh->GetTexture(), true);
-	root = new SceneNode();
-
-	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightY = 2000 * HEIGHTMAP_Y / 2.0f;
-	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
-	root->SetTransform(Matrix4::Translation(Vector3(heightX / 2.0f, 0, heightZ / 2.0f)));
-	root->SetShader(testShader);
-
-	SceneNode* tree = new SceneNode();
-	tree->SetMesh(mesh);
-	tree->SetShader(testShader);
-	tree->SetModelScale(Vector3(5.0f, 5.0f, 5.0f));
-	tree->SetTransform(Matrix4::Translation(Vector3(0,0,0)));
-	
-	root->AddChild(tree);
-	//
-
 	if (!reflectShader->LinkProgram() || !skyboxShader->LinkProgram() || !lightShader->LinkProgram() || !testShader->LinkProgram()) {
 		return;
 	}
-	quad->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 
+	configureScene();
+	quad->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
 		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
 		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
@@ -84,18 +68,17 @@ void Renderer::RenderScene() {
 	DrawTerrain();
 	DrawWater();
 	
-	//testMethod();
+	testMethod();
 
 	SwapBuffers();
 }
 
 void Renderer::UpdateScene(float msec) {
 	camera->UpdateCamera(msec);
+	camera->moveCameraAuto(msec);
 	viewMatrix = camera->BuildViewMatrix();
-	waterRotate += msec / 1000.0f;
-	//
-	//root->Update(msec);
-	//
+	waterRotate += msec / 1000.0f; 
+	root->Update(msec);
 }
 
 void Renderer::DrawTerrain()
@@ -137,7 +120,7 @@ void Renderer::DrawWater()
 	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
 	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightY = 1300 * HEIGHTMAP_Y / 2.0f;
+	float heightY = 800 * HEIGHTMAP_Y / 2.0f;
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
 
 	modelMatrix = Matrix4::Translation(Vector3(heightX, heightY, heightZ)) *
@@ -169,42 +152,69 @@ void Renderer::BindTextureToSamplerAndUniform(unsigned int textureUnit, GLuint t
 }
 
 void Renderer::testMethod() {
-	/*SetCurrentShader(testShader);
-	SetShaderLight(*light);
-	BindTextureToSamplerAndUniform(0, tree->getMesh()->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
-
-	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightY = 2000 * HEIGHTMAP_Y / 2.0f;
-	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
-
-	tree->updateHeight();
-	modelMatrix = Matrix4::Translation(Vector3(heightX / 2.0f, heightY / 2.0f, heightZ / 2.0f)) *
-		Matrix4::Scale(Vector3(tree->getHeight(), tree->getHeight(), tree->getHeight()));
-
-	UpdateShaderMatrices();
-	tree->getMesh()->Draw();*/
 	DrawNode(root);
 }
 
-void Renderer::DrawNode(SceneNode* n)
+void Renderer::DrawNode(SceneNode* node)
 {
 	glUseProgram(currentShader->GetProgram());
-	if (n->GetMesh()) {
-		if (n->GetShader()) {
+	if (node->GetMesh()) {
+		if (node->GetShader()) {
 			SetShaderLight(*light);
-			SetCurrentShader(n->GetShader());
-			modelMatrix = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
+			SetCurrentShader(node->GetShader());
+			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
 			UpdateShaderMatrices();
-			BindTextureToSamplerAndUniform(0, tree->getMesh()->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
-			BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
-			glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
-
-			n->Draw(*this);
+			if (node->getObjMesh() != nullptr) {
+				BindTextureToSamplerAndUniform(6, terrain->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
+				BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
+				glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
+			} else {
+				BindTextureToSamplerAndUniform(6, terrain->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
+				BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
+				glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
+			}
+			node->Draw(*this);
 		}
 	}
 	glUseProgram(0);
-	for (vector<SceneNode*>::const_iterator i = n->getChildIteratorStart(); i != n->getChildIteratorEnd(); ++i) {
+	for (vector<SceneNode*>::const_iterator i = node->getChildIteratorStart(); i != node->getChildIteratorEnd(); ++i) {
 		DrawNode(*i);
 	}
 }
 
+void Renderer::configureScene()
+{
+	OBJMesh* mesh = new OBJMesh();
+	mesh->LoadOBJMesh(MESHDIR"Tree.obj");
+	vector<Mesh*> childs = mesh->getChilds();
+	childs[0]->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	SetTextureRepeating(childs[0]->GetTexture(), true);
+	childs[1]->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	SetTextureRepeating(childs[1]->GetTexture(), true);
+
+	
+	root = new SceneNode();
+
+	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
+	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
+	root->SetTransform(Matrix4::Translation(Vector3(heightX, 0, heightZ)));
+	root->SetShader(testShader);
+
+	for (int i = 0; i < 1000; i++) {
+
+		SceneNode* tree = new SceneNode();
+		tree->setObjMesh(mesh);
+		tree->SetShader(testShader);
+		tree->SetModelScale(Vector3(1.0f, 1.0f, 1.0f));
+		tree->SetTransform(Matrix4::Translation(Vector3(RandomFloat(-heightX, heightX), 0, RandomFloat(-heightZ, heightZ))));
+
+		root->AddChild(tree);
+	}
+}
+
+float Renderer::RandomFloat(float a, float b) {
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float diff = b - a;
+	float r = random * diff;
+	return a + r;
+}

@@ -1,8 +1,9 @@
 #include "SceneNode.h"
 
-SceneNode::SceneNode(Mesh* m, Vector4 colour)
+SceneNode::SceneNode(Mesh* m, Vector4 colour, OBJMesh* mesh)
 {
 	this->mesh = m;
+	this->objMesh = mesh;
 	this->colour = colour;
 	boundingRadius = 1.0f;
 	distanceFromCamera = 0.0f;
