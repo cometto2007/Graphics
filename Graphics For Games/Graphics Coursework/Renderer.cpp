@@ -1,7 +1,7 @@
 #include "Renderer.h"
 
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
-	terrain = new Terrain(2.0f, 2000.0f, 2000.f);
+	terrain = new Terrain(2.0f, 3000.0f, 3000.f);
 
 	camera = new Camera({ -40, 270, Vector3(-2100, 3300, 2000) });
 	camera->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
@@ -120,7 +120,7 @@ void Renderer::DrawWater()
 	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
 	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightY = 800 * HEIGHTMAP_Y / 2.0f;
+	float heightY = 1550 * HEIGHTMAP_Y / 2.0f;
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
 
 	modelMatrix = Matrix4::Translation(Vector3(heightX, heightY, heightZ)) *
@@ -158,22 +158,26 @@ void Renderer::testMethod() {
 void Renderer::DrawNode(SceneNode* node)
 {
 	glUseProgram(currentShader->GetProgram());
-	if (node->GetMesh()) {
+	if (node->GetMesh() || node->getObjMesh()) {
 		if (node->GetShader()) {
 			SetShaderLight(*light);
 			SetCurrentShader(node->GetShader());
 			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
 			UpdateShaderMatrices();
 			if (node->getObjMesh() != nullptr) {
-				BindTextureToSamplerAndUniform(6, terrain->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
-				BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
-				glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
+				for (Mesh* m : node->getObjMesh()->getChilds()) {
+					BindTextureToSamplerAndUniform(6, m->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
+					BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
+					glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
+					m->Draw();
+				}
+				node->getObjMesh()->Draw();
 			} else {
-				BindTextureToSamplerAndUniform(6, terrain->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
+				BindTextureToSamplerAndUniform(6, node->GetMesh()->GetTexture(), "diffuseTex", currentShader, GL_TEXTURE_2D);
 				BindTextureToSamplerAndUniform(5, terrain->getDeptMap(), "deptTex", currentShader, GL_TEXTURE_2D);
 				glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "height"), terrain->getHeight());
+				node->GetMesh()->Draw();
 			}
-			node->Draw(*this);
 		}
 	}
 	glUseProgram(0);
@@ -185,12 +189,20 @@ void Renderer::DrawNode(SceneNode* node)
 void Renderer::configureScene()
 {
 	OBJMesh* mesh = new OBJMesh();
-	mesh->LoadOBJMesh(MESHDIR"Tree.obj");
+	mesh->LoadOBJMesh(MESHDIR"Tree3.obj");
 	vector<Mesh*> childs = mesh->getChilds();
-	childs[0]->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	SetTextureRepeating(childs[0]->GetTexture(), true);
-	childs[1]->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	SetTextureRepeating(childs[1]->GetTexture(), true);
+	if (childs.size() > 0) {
+		mesh->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+		SetTextureRepeating(mesh->GetTexture(), true);
+		childs[0]->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"grass.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+		SetTextureRepeating(childs[0]->GetTexture(), true);
+		//childs[1]->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+		//SetTextureRepeating(childs[1]->GetTexture(), true);
+	} else {
+		mesh->setTexture(SOIL_load_OGL_texture(TEXTUREDIR"grass.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+		SetTextureRepeating(mesh->GetTexture(), true);
+	}
+	
 
 	
 	root = new SceneNode();
@@ -199,13 +211,13 @@ void Renderer::configureScene()
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
 	root->SetTransform(Matrix4::Translation(Vector3(heightX, 0, heightZ)));
 	root->SetShader(testShader);
-
+	float scale = 100.0f;
 	for (int i = 0; i < 1000; i++) {
 
 		SceneNode* tree = new SceneNode();
 		tree->setObjMesh(mesh);
 		tree->SetShader(testShader);
-		tree->SetModelScale(Vector3(1.0f, 1.0f, 1.0f));
+		tree->SetModelScale(Vector3(scale, scale, scale));
 		tree->SetTransform(Matrix4::Translation(Vector3(RandomFloat(-heightX, heightX), 0, RandomFloat(-heightZ, heightZ))));
 
 		root->AddChild(tree);

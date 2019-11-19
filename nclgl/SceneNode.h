@@ -27,7 +27,7 @@ public:
 	Mesh* GetMesh() const { return mesh; }
 	void SetMesh(Mesh* m) { mesh = m; }
 
-	Mesh* getObjMesh() const { return objMesh; }
+	OBJMesh* getObjMesh() const { return objMesh; }
 	void setObjMesh(OBJMesh* m) { objMesh = m; }
 
 	float GetBoundingRadius() const { return boundingRadius; }

@@ -59,7 +59,7 @@ void main(void) {
 	OUT.fragHeight = texel.r * 1000;
 	
 	OUT.colour = colour;
-	OUT.texCoord = (textureMatrix * vec4 (texCoord * 2, 0.0, 1.0)).xy;
+	OUT.texCoord = (textureMatrix * vec4 (texCoord * 5, 0.0, 1.0)).xy;
 	
 	OUT.normal = normalize(normalMatrix * normalize(normal));
 	OUT.tangent = normalize(normalMatrix * normalize(tangent));

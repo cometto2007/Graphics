@@ -56,13 +56,14 @@ void main(void) {
 		fragColour = vec4(colour * atten * lambert, cliffs.a);
 		fragColour.rgb += (cliffs.rgb * lightColour.rgb) * 0.1;
 	} else if (IN.isSand > 0.5f) {
+		if (IN.isWetSand > 0.5f) {
+			colour += (wetSand.rgb * lightColour.rgb);
+			fragColour = vec4(colour * atten * lambert, wetSand.a);
+			fragColour.rgb += (wetSand.rgb * lightColour.rgb) * 0.1;
+		}
 		colour += (sand.rgb * lightColour.rgb);
 		fragColour = vec4(colour * atten * lambert, sand.a);
 		fragColour.rgb += (sand.rgb * lightColour.rgb) * 0.1;
-	} else if (IN.isWetSand > 0.5f) {
-		colour += (wetSand.rgb * lightColour.rgb);
-		fragColour = vec4(colour * atten * lambert, wetSand.a);
-		fragColour.rgb += (wetSand.rgb * lightColour.rgb) * 0.1;
 	} else if (IN.isGrass > 0.5f) {
 		colour += (grass.rgb * lightColour.rgb);
 		fragColour = vec4(colour * atten * lambert, grass.a);
