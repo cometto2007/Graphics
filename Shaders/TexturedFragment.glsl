@@ -6,6 +6,11 @@ uniform sampler2D waterTex;
 in Vertex {
 	vec2 texCoord;
 	float fragHeight;
+	vec4 	colour;
+	vec2 	texCoord;
+	vec3 	normal;
+	vec3 	tangent;
+	vec3 	worldPos;
 } IN;
 
 out vec4 fragColour;

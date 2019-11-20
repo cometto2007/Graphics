@@ -13,6 +13,8 @@ class Renderer : public OGLRenderer {
 	
 	virtual void UpdateScene(float msec);
 	virtual void RenderScene();
+
+	void moveLight(float x, float z);
 	
 protected:
 	void DrawMesh(); // New !

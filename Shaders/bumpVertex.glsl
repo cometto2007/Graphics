@@ -3,6 +3,7 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 uniform mat4 textureMatrix;
+uniform mat4 shadowMatrix;
 
 uniform float height;
 
@@ -25,11 +26,11 @@ out Vertex {
 	vec3 tangent;
 	vec3 binormal; 
 	vec3 worldPos;
+	vec4 shadowProj;
 	float isGrass;
 	float isSand;
 	float isWetSand;
 	float isCliffs;
-	float fragHeight;
 } OUT;
 
 void main(void) {
@@ -56,8 +57,6 @@ void main(void) {
 		OUT.isCliffs = 0.0f;
 	}
 
-	OUT.fragHeight = texel.r * 1000;
-	
 	OUT.colour = colour;
 	OUT.texCoord = (textureMatrix * vec4 (texCoord * 5, 0.0, 1.0)).xy;
 	
@@ -66,6 +65,9 @@ void main(void) {
 	OUT.binormal = normalize(normalMatrix * normalize (cross(normal, tangent)));
 	
 	OUT.worldPos = (modelMatrix * vec4(position ,1)).xyz;
+
+	vec3 realPos = vec3(position.x, texel.r * height, position.z);
+	OUT.shadowProj = (shadowMatrix * vec4(realPos + (normal * 1.5), 1));
 	
-	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, texel.r * height, position.z, 1.0);
+	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(realPos, 1.0);
 }

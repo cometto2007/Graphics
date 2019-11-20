@@ -20,6 +20,10 @@ public:
 	static Mesh* GenerateCube();
 
 	void* getColorBufferPointer();
+	void setTransformation(Matrix4& transform) {
+		for (size_t i = 0; i < numVertices; i++)
+			vertices[i] = transform * vertices[i];
+	}
 
 protected:
 	void BufferData();

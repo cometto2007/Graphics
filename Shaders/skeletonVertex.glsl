@@ -16,6 +16,7 @@ layout(location = 10) in vec2 weighting;
 
 out Vertex	{
 	vec4 	colour;
+	float fragHeight;
 	vec2 	texCoord;
 	vec3 	normal;
 	vec3 	tangent;
@@ -60,6 +61,8 @@ void main(void)	{
 	
 	OUT.normal 		= normalMatrix * normalize(oNormal);
 	OUT.tangent 	= normalMatrix * normalize(oTangent);
+
+	OUT.fragHeight = 200.0;
 
 	gl_Position		= (projMatrix * viewMatrix * modelMatrix) * vec4(vertPos.xyz, 1.0);
 }

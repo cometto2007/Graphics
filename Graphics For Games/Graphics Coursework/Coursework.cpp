@@ -34,6 +34,20 @@ int main() {
 			renderer.setCameraConfsIndex(0);
 			renderer.setCameraAuto(true);
 		}
+		if (Window::GetKeyboard()->KeyDown(KEYBOARD_LEFT)) {
+			renderer.moveLight(-10.0f, 0.0f);
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KEYBOARD_RIGHT)) {
+			renderer.moveLight(10.0f, 0.0f);
+		}
+		if (Window::GetKeyboard()->KeyDown(KEYBOARD_UP)) {
+			renderer.moveLight(0.0f, 10.0f);
+		}
+
+		if (Window::GetKeyboard()->KeyDown(KEYBOARD_DOWN)) {
+			renderer.moveLight(0.0f, -10.0f);
+		}
 		renderer.UpdateScene(w.GetTimer()->GetTimedMS());
 		//picker->update();
 		//cout << picker->getRay();
