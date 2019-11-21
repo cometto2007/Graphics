@@ -116,6 +116,8 @@ public:
 
 	Matrix4 GetProjectionMatrix() { return projMatrix; };
 
+	void BindTextureToSamplerAndUniform(unsigned int textureUnit, GLuint tex, GLchar* uniformName, Shader* shader, GLuint texType) const;
+
 protected:
 	void SetShaderLight(const Light& l);
 	virtual void	Resize(int x, int y);	

@@ -256,9 +256,9 @@ all of the children of 'this' will be drawn
 */
 void OBJMesh::Draw() {
 	Mesh::Draw();
-	for(unsigned int i = 0; i < children.size(); ++i) {
+	/*for(unsigned int i = 0; i < children.size(); ++i) {
 		children.at(i)->Draw();
-	}
+	}*/
 };
 
 void	OBJMesh::SetTexturesFromMTL(string &mtlFile, string &mtlType, map <string, MTLInfo>& materials) {

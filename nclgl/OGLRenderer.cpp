@@ -338,6 +338,13 @@ void	OGLRenderer::DrawDebugOrtho(Matrix4*matrix) {
 	SetCurrentShader(currentShader);
 }
 
+void OGLRenderer::BindTextureToSamplerAndUniform(unsigned int textureUnit, GLuint tex, GLchar* uniformName, Shader* shader, GLuint texType) const
+{
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(texType, tex);
+	glUniform1i(glGetUniformLocation(shader->GetProgram(), uniformName), textureUnit);
+}
+
 void	OGLRenderer::DrawDebugLine  (DebugDrawMode mode, const Vector3 &from,const Vector3 &to,const Vector3 &fromColour,const Vector3 &toColour) {
 	DebugDrawData*target = (mode == DEBUGDRAW_ORTHO ? target = orthoDebugData : target = perspectiveDebugData);
 

@@ -3,10 +3,14 @@
 #include "../../nclgl/Camera.h"
 #include "../../nclgl/SceneNode.h"
 #include "../../nclgl/OBJMesh.h"
+#include "Tree.h"
+#include "Loader.h"
 #include <stdlib.h>
 #include "Terrain.h"
-#include "MousePicker.h"
 #define SHADOWSIZE 2048
+#define CAMERA_X 23108
+#define CAMERA_Y 11500
+#define CAMERA_Z 15208
 
 class Renderer : public OGLRenderer {
 public:
@@ -16,19 +20,15 @@ public:
 	virtual void RenderScene();
 	virtual void UpdateScene(float msec);
 
-	void BindTextureToSamplerAndUniform(unsigned int textureUnit, GLuint tex, GLchar* uniformName, Shader* shader, GLuint texType);
 	Camera* GetCamera() { return camera; };
 	Terrain* GetTerrain() { return terrain; };
 
-	void moveLight(float x, float z);
+	void moveLight(float x, float y, float z);
 
-	void setMousePicker(MousePicker* mp) { this->mp = mp; };
 	void setCameraConfsIndex(int i) { camera->setCameraIndex(i); };
 	void setCameraAuto(bool b) { camera->setAutoCam(b); };
 	
 protected:
-	MousePicker* mp;
-
 	Shader* lightShader;
 	Shader* reflectShader;
 	Shader* skyboxShader;
@@ -36,6 +36,7 @@ protected:
 	Shader* shadowShader;
 	Shader* sceneShader;
 	Shader* test1Shader;
+	Shader* sceneNodeShadowShader;
 
 	Camera* camera;
 	Terrain* terrain;

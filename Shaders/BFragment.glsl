@@ -17,6 +17,7 @@ in Vertex {
 	vec3 binormal;
 	vec3 worldPos;
 	vec4 shadowProj;
+	float discardFrag;
 } IN;
 
 out vec4 fragColour;
@@ -31,6 +32,9 @@ float calculateShadow() {
 }
 
 void main(void) {
+	if (IN.discardFrag > 0.5) {
+		discard;
+	}
 	vec4 diffuse = texture(diffuseTex, IN.texCoord);
 	mat3 TBN = mat3(IN.tangent, IN.binormal, IN.normal);
 	vec3 normal = normalize(TBN * (texture(bumpTex, IN.texCoord).rgb * 2.0 - 1.0));

@@ -85,24 +85,4 @@ void main(void) {
 		fragColour = vec4(colour * atten * lambert, diffuse.a);
 		fragColour.rgb += (diffuse.rgb * lightColour.rgb) * 0.1;
 	}
-
-	float t = calculateShadow();
-
-
-
-	vec3 test = IN.shadowProj.xyz / IN.shadowProj.w;
-
-	test = test * 0.5;
-	test = test + vec3(0.5);
-
-
-
-	if (test.x > 0.0f && test.x <= 1.0f) {
-		fragColour.r = test.x;
-	}
-	if (test.y > 0.0f && test.y <= 1.0f) {
-		fragColour.g = test.y;
-	}	
-	
-	fragColour.rgb = vec3(t);
 }
