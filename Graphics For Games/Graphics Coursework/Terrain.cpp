@@ -1,7 +1,10 @@
 #include "Terrain.h"
 
-Terrain::Terrain(float speed, float maxHeight, float currentHeight) : GrowingMesh(speed, maxHeight, currentHeight)
+Terrain::Terrain(float speed, float maxHeight, float currentHeight)
 {
+	this->speed = speed;
+	this->maxHeight = maxHeight;
+	this->currentHeight = currentHeight;
 	numVertices = RAW_WIDTH * RAW_HEIGHT;
 	numIndices = (RAW_WIDTH - 1) * (RAW_HEIGHT - 1) * 6;
 	vertices = new Vector3[numVertices];
@@ -84,4 +87,57 @@ void Terrain::Draw()
 		glDrawArrays(type, 0, numVertices);
 	}
 	glBindVertexArray(0);
+}
+
+float Terrain::getHeight()
+{
+	return currentHeight;
+}
+
+void Terrain::updateHeight()
+{
+	float newHeight = currentHeight + speed;
+	if (newHeight <= maxHeight) {
+		currentHeight = newHeight;
+	}
+	else {
+		currentHeight = maxHeight;
+	}
+}
+
+void Terrain::Draw(const OGLRenderer& r)
+{
+	Loader loader = Loader::getInstance();
+	updateHeight();
+
+	//glUniform3fv(glGetUniformLocation(r.GetCurrentShader()->GetProgram(), "cameraPos"), 1, (float*)&r.getcamera->GetPosition());
+	glUniform1f(glGetUniformLocation(r.GetCurrentShader()->GetProgram(), "height"), getHeight());
+	r.BindTextureToSamplerAndUniform(0, loader.getGroundTex(), "diffuseTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(1, loader.getBumpMap(), "bumpTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(2, loader.getDeptMap(), "deptTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(3, loader.getGrassMap(), "grassMap", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(4, loader.getSandMap(), "sandMap", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(5, loader.getSandWetMap(), "sandWetMap", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(6, loader.getCliffsMap(), "cliffsMap", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(7, loader.getGrassTex(), "grassTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(8, loader.getSandText(), "sandTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(9, loader.getSandWetText(), "sandWetTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(10, loader.getCliffsText(), "cliffsTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+
+	glBindVertexArray(arrayObject);
+	if (bufferObject[INDEX_BUFFER]) {
+		glDrawElements(type, numIndices, GL_UNSIGNED_INT, 0);
+	}
+	else {
+		glDrawArrays(type, 0, numVertices);
+	}
+	glBindVertexArray(0);
+	//r.BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", currentShader, GL_TEXTURE_2D);
+
+	//modelMatrix.ToIdentity();
+	//textureMatrix.ToIdentity();
+	//UpdateShaderMatrices();
+	//Matrix4 tempMatrix = shadowMatrix * modelMatrix;
+	//glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
+	//terrain->Draw();
 }

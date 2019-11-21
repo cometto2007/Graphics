@@ -1,5 +1,6 @@
 #pragma once
-#include "../../nclgl/GrowingMesh.h"
+#include "../../nclgl/Mesh.h"
+#include "Loader.h"
 
 #define RAW_WIDTH 513
 #define RAW_HEIGHT 513
@@ -12,13 +13,13 @@
 
 #define HEIGHT_MAX 2000.0f
 
-class Terrain : public GrowingMesh
+class Terrain : public Mesh
 {
 public:
 	Terrain(float speed, float maxHeight, float currentHeight);
 	~Terrain();
 
-	void Draw() override;
+	void Draw();
 
 	GLuint getDeptMap() { return deptMap; };
 	void setDeptMap(GLuint deptMap) { this->deptMap = deptMap;  };
@@ -47,6 +48,11 @@ public:
 	GLuint getSandText() { return sandText; };
 	void setSandText(GLuint sandText) { this->sandText = sandText; };
 
+	float getHeight();
+	void updateHeight();
+
+	virtual void Draw(const OGLRenderer& r);
+
 private:
 	GLuint deptMap;
 	GLuint grassMap;
@@ -58,6 +64,10 @@ private:
 	GLuint cliffsText;
 	GLuint sandWetText;
 	GLuint sandText;
+
+	float speed;
+	float currentHeight;
+	float maxHeight;
 
 	GLuint deptMapFBO;
 };

@@ -6,7 +6,6 @@ uniform int isVertical ;
 
 in Vertex {
 	vec2 texCoord;
-	float fragHeight;
 	//vec4 colour ;
 } IN;
 

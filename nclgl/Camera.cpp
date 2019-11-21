@@ -46,6 +46,10 @@ void Camera::UpdateCamera(float msec)	{
 	if(Window::GetKeyboard()->KeyDown(KEYBOARD_SPACE)) {
 		position.y -= msec;
 	}
+
+	//cout << "position: " << position << endl;
+	//cout << "yaw: " << yaw << endl;
+	//cout << "pitch: " << pitch << endl;
 }
 
 /*
@@ -62,7 +66,6 @@ Matrix4 Camera::BuildViewMatrix()	{
 
 void Camera::moveCameraAuto(float msec)
 {
-	// TODO: add modularity for all the points
 	if (autoMov) {
 		CameraData cd1 = cameraConfs[cameraConfsIndex];
 		CameraData cd2 = cameraConfs[cameraConfsIndex + 1];

@@ -22,6 +22,7 @@ public:
 	GLuint getSandText() { return sandTex; };
 	GLuint getBumpMap() { return bumpMap; };
 	GLuint getGroundTex() { return groundTex; };
+	GLuint getWaterTex() { return waterTex; };
 
 private:
 	Loader();
@@ -41,7 +42,8 @@ private:
 	GLuint sandWetTex;
 	GLuint sandTex;
 	GLuint groundTex;
-
+	GLuint waterTex;
+	
 	void SetTextureRepeating(GLuint target, bool repeating);
 };
 
