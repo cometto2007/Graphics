@@ -90,10 +90,12 @@ public:
 	void addCameraConf(CameraData cd) { cameraConfs.push_back(cd); };
 	void incrCameraIndex() { cameraConfsIndex++; };
 	void setCameraIndex(int index) { 
-		if (index <= cameraConfs.size() - 1) {
+		/*if (index <= cameraConfs.size() - 1) {
 			cameraConfsIndex = index;
 			setData(cameraConfs[index]);
-		}
+		}*/
+		cameraConfsIndex = index;
+		setData(cameraConfs[index]);
 	};
 	int getCameraIndex() { return cameraConfsIndex; };
 	void setCameraSpeed(int speed) { this->speed = speed; };

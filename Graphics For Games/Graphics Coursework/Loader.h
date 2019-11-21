@@ -1,5 +1,7 @@
 #pragma once
 #include "../../nclgl/OBJMesh.h"
+#include "../../nclgl/MD5Mesh.h"
+#include "../../nclgl/MD5Node.h"
 
 class Loader
 {
@@ -9,6 +11,7 @@ public:
 		static Loader instance; 
 		return instance;
 	}
+	MD5FileData* getBirdData(){ return birdData; }
 	OBJMesh* getTree() { return tree; };
 	GLuint getGrassTex() { return grassTex; };
 	GLuint getBarkTex() { return barkTex; };
@@ -43,7 +46,9 @@ private:
 	GLuint sandTex;
 	GLuint groundTex;
 	GLuint waterTex;
-	
+
+	MD5FileData* birdData;
+
 	void SetTextureRepeating(GLuint target, bool repeating);
 };
 

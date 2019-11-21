@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bird.cpp" />
     <ClCompile Include="Coursework.cpp" />
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -18,6 +19,7 @@
     <ClCompile Include="Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bird.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Terrain.h" />

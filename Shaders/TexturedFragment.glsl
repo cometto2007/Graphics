@@ -4,9 +4,8 @@ uniform sampler2D diffuseTex;
 uniform sampler2D waterTex;
 
 in Vertex {
-	vec2 texCoord;
-	float fragHeight;
 	vec4 	colour;
+	float fragHeight;
 	vec2 	texCoord;
 	vec3 	normal;
 	vec3 	tangent;
@@ -16,9 +15,10 @@ in Vertex {
 out vec4 fragColour;
 
 void main(void) {
-	if (IN.fragHeight < 300) {
-		fragColour = texture(waterTex, IN.texCoord);
-	} else {
-		fragColour = texture(diffuseTex, IN.texCoord);
-	}
+	//if (IN.fragHeight < 300) {
+	//	fragColour = texture(waterTex, IN.texCoord);
+	//} else {
+	//	fragColour = texture(diffuseTex, IN.texCoord);
+	//}
+	fragColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

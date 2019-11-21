@@ -9,7 +9,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	currentShader   = new Shader(SHADERDIR"TexturedVertex.glsl", SHADERDIR"TexturedFragment.glsl");
 #endif
 
-	hellData		= new MD5FileData(MESHDIR"hellknight.md5mesh");
+	hellData		= new MD5FileData(MESHDIR"test1.md5mesh");
 
 	hellNode		= new MD5Node(*hellData);
 
@@ -17,8 +17,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 		return;
 	}
 
-	hellData->AddAnim(MESHDIR"idle2.md5anim");
-	hellNode->PlayAnim(MESHDIR"idle2.md5anim");
+	hellData->AddAnim(MESHDIR"test1.md5anim");
+	hellNode->PlayAnim(MESHDIR"test1.md5anim");
 
 	projMatrix = Matrix4::Perspective(1.0f,10000.0f,(float)width / (float)height, 45.0f);
 
@@ -37,9 +37,9 @@ Renderer::~Renderer(void)	{
 
  void Renderer::UpdateScene(float msec)	{
 	camera->UpdateCamera(msec); 
-	viewMatrix		= camera->BuildViewMatrix();
+	viewMatrix	= camera->BuildViewMatrix();
 
-	hellNode->Update(msec);
+	hellNode->Update(msec * 2);
 }
 
 void Renderer::RenderScene()	{
@@ -50,13 +50,18 @@ void Renderer::RenderScene()	{
 
 	UpdateShaderMatrices();
 
-	for(int y = 0; y < 10; ++y) {
+	//Vector3 newPos = hellNode->GetWorldTransform();
+	hellNode->SetTransform(hellNode->GetWorldTransform() * Matrix4::Translation(Vector3(-2.0f, 0.0f, -2.0f)));
+	modelMatrix = hellNode->GetWorldTransform() * Matrix4::Rotation(-90, Vector3(1.0f, 0.0f, 0.0f));
+	UpdateShaderMatrices();
+	hellNode->Draw(*this);
+	/*for(int y = 0; y < 10; ++y) {
 		for(int x = 0; x < 10; ++x) {
 			modelMatrix = Matrix4::Translation(Vector3(x * 100, 0, y * 100));
 			UpdateShaderMatrices();	
 			hellNode->Draw(*this);
 		}
-	}
+	}*/
 
 	glUseProgram(0);
 	SwapBuffers();

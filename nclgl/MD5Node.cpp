@@ -12,7 +12,9 @@ MD5Node::MD5Node(const MD5FileData &ofType) : sourceData(ofType)	{
 }
 
 MD5Node::~MD5Node(void)	{
-
+	currentAnim = NULL;
+	frameTime = 0.0f;
+	currentAnimFrame = 0;
 }
 
 /*

@@ -3,6 +3,7 @@
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	//terrain = new Terrain(0.25f, 3000.0f, 1500.f);
 	terrain = new Terrain(0.25f, 3000.0f, 3000.f);
+	bird = new Bird(*loader.getBirdData(), 150.0f);
 
 	camera = new Camera({ -40, 270, Vector3(-2100, 3300, 2000) });
 	camera->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
@@ -34,7 +35,8 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	
 	postProcessShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_texturedFragment.glsl");
 	processShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_processfrag.glsl");
-	
+	animationShader = new Shader(SHADERDIR"skeletonvertex.glsl", SHADERDIR"TexturedFragment.glsl");
+
 	if (!reflectShader->LinkProgram() ||
 		!skyboxShader->LinkProgram() ||
 		!lightShader->LinkProgram() ||
@@ -45,7 +47,8 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 		!sceneNodeShadowShader->LinkProgram() ||
 		!calcShadowGrassField->LinkProgram() ||
 		!processShader->LinkProgram() ||
-		!postProcessShader->LinkProgram()) {
+		!postProcessShader->LinkProgram() ||
+		!animationShader->LinkProgram()) {
 		return;
 	}
 
@@ -122,6 +125,8 @@ void Renderer::RenderScene() {
 }
 
 void Renderer::UpdateScene(float msec) {
+	// TODO: add if
+	bird->Update(msec * 10);
 	camera->UpdateCamera(msec);
 	camera2->UpdateCamera(msec);
 	camera->moveCameraAuto(msec);
@@ -156,6 +161,13 @@ void Renderer::DrawRain()
 		UpdateShaderMatrices();
 		rainDrop->Draw();
 	}
+
+	// DRAW BIRD
+	SetCurrentShader(animationShader);
+	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+	modelMatrix = bird->GetWorldTransform() * Matrix4::Rotation(-90, Vector3(1.0f, 0.0f, 0.0f));
+	UpdateShaderMatrices();
+	bird->Draw(*this);
 }
 
 void Renderer::DrawWater()

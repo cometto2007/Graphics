@@ -37,6 +37,7 @@ _-_-_-_-_-_-_-""  ""
 class MD5Node : public SceneNode {
 public:
 	MD5Node(const MD5FileData& ofType);
+	MD5Node();
 	~MD5Node(void);
 
 	/*

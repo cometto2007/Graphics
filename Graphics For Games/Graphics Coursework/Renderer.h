@@ -4,6 +4,7 @@
 #include "../../nclgl/SceneNode.h"
 #include "../../nclgl/OBJMesh.h"
 #include "Tree.h"
+#include "Bird.h"
 #include "Loader.h"
 #include <stdlib.h>
 #include "Terrain.h"
@@ -50,6 +51,9 @@ protected:
 	Shader* calcShadowGrassField;
 	Shader* processShader;
 	Shader* postProcessShader;
+	Shader* animationShader;
+
+	Bird* bird;
 
 	Camera* camera;
 	Camera* camera2;

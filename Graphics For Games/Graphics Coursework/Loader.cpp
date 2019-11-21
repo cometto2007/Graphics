@@ -5,6 +5,9 @@ Loader::Loader()
 	tree = new OBJMesh();
 	tree->LoadOBJMesh(MESHDIR"Tree.obj");
 
+	birdData = new MD5FileData(MESHDIR"test1.md5mesh");
+	birdData->AddAnim(MESHDIR"test1.md5anim");
+
 	barkTex = SOIL_load_OGL_texture(TEXTUREDIR"bark.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	groundTex = SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	grassTex = SOIL_load_OGL_texture(TEXTUREDIR"grass.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
