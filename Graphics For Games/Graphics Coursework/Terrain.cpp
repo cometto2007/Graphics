@@ -123,6 +123,7 @@ void Terrain::Draw(const OGLRenderer& r)
 	r.BindTextureToSamplerAndUniform(8, loader.getSandText(), "sandTex", r.GetCurrentShader(), GL_TEXTURE_2D);
 	r.BindTextureToSamplerAndUniform(9, loader.getSandWetText(), "sandWetTex", r.GetCurrentShader(), GL_TEXTURE_2D);
 	r.BindTextureToSamplerAndUniform(10, loader.getCliffsText(), "cliffsTex", r.GetCurrentShader(), GL_TEXTURE_2D);
+	r.BindTextureToSamplerAndUniform(12, loader.getGrassBumpMap(), "grassBumpMap", r.GetCurrentShader(), GL_TEXTURE_2D);
 
 	glBindVertexArray(arrayObject);
 	if (bufferObject[INDEX_BUFFER]) {

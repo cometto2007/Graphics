@@ -26,6 +26,8 @@ public:
 	GLuint getBumpMap() { return bumpMap; };
 	GLuint getGroundTex() { return groundTex; };
 	GLuint getWaterTex() { return waterTex; };
+	GLuint getGrassBumpMap() { return grassBumpMap; };
+	GLuint getCliffsBumpMap() { return cliffsBumpMap; };
 
 private:
 	Loader();
@@ -46,6 +48,9 @@ private:
 	GLuint sandTex;
 	GLuint groundTex;
 	GLuint waterTex;
+
+	GLuint grassBumpMap;
+	GLuint cliffsBumpMap;
 
 	MD5FileData* birdData;
 

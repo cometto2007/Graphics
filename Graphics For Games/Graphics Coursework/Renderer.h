@@ -13,28 +13,29 @@
 #define LIGHT_Y 11500
 #define LIGHT_Z 15208
 
-#define POST_PASSES 0
-
 class Renderer : public OGLRenderer {
 public:
+	int post_passes = 10;
+
 	Renderer(Window& parent);
 	virtual ~Renderer(void);
 
 	virtual void RenderScene();
 	virtual void UpdateScene(float msec);
 
-	Camera* GetCamera() { return camera; };
-	Terrain* GetTerrain() { return terrain; };
-
 	void moveLight(float x, float y, float z);
+
+	void toggleBlur() { isBlur = !isBlur; };
+	void toggleSplitScreen() { isSplitScreen = !isSplitScreen; };
+	void setPostPasses(int post_passes) { post_passes = post_passes; };
 
 	void setCameraConfsIndex(int i) { 
 		camera->setCameraIndex(i);
-		camera2->setCameraIndex(i);
+		//camera2->setCameraIndex(i);
 	};
 	void setCameraAuto(bool b) { 
 		camera->setAutoCam(b);
-		camera2->setAutoCam(b);
+		//camera2->setAutoCam(b);
 	};
 	
 protected:
@@ -53,19 +54,17 @@ protected:
 	Shader* postProcessShader;
 	Shader* animationShader;
 
-	Bird* bird;
-
 	Camera* camera;
 	Camera* camera2;
 	Terrain* terrain;
 	Mesh* quad;
 	Mesh* rainDrop;
 	Mesh* quadPost;
-	OBJMesh* obj;
 	SceneNode* cube;
 	Light* light;
 	Light* light2;
 	SceneNode* root;
+	SceneNode* birds;
 
 	GLuint cubeMap;
 	GLuint shadowTex;
@@ -74,6 +73,9 @@ protected:
 	GLuint bufferColourTex[2];
 	GLuint bufferFBO;
 	GLuint processFBO;
+
+	bool isSplitScreen;
+	bool isBlur;
 
 	float waterRotate;
 
@@ -87,7 +89,7 @@ protected:
 	void PresentScene();
 	void DrawPostProcess();
 
-	void DrawNode(SceneNode* n);
+	void DrawNode(SceneNode* n, bool isShadow);
 
 	void configureScene();
 	void configureShadow();

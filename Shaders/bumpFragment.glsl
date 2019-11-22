@@ -2,6 +2,7 @@
 
 uniform sampler2D diffuseTex;
 uniform sampler2D bumpTex;
+uniform sampler2D grassBumpMap;
 uniform sampler2D grassTex;
 uniform sampler2D sandTex;
 uniform sampler2D sandWetTex;
@@ -48,7 +49,14 @@ void main(void) {
 	
 	mat3 TBN = mat3(IN.tangent, IN.binormal, IN.normal);
 	
-	vec3 normal = normalize(TBN *(texture(bumpTex, IN.texCoord).rgb * 2.0 - 1.0));
+	vec3 normal = normalize(TBN * (texture(bumpTex, IN.texCoord).rgb * 2.0 - 1.0));;
+	if (IN.isCliffs > 0.5f) {
+		normal = normalize(TBN * (texture(bumpTex, IN.texCoord).rgb * 2.0 - 1.0));
+	} else if (IN.isGrass > 0.5f) {
+		normal = normalize(TBN * (texture(grassBumpMap, IN.texCoord).rgb * 2.0 - 1.0));
+	}
+
+	//vec3 normal = normalize(TBN *(texture(bumpTex, IN.texCoord).rgb * 2.0 - 1.0));
 	vec3 incident = normalize(lightPos - IN.worldPos);
 	float lambert = max(0.0, dot(incident, normal));
 	lambert *= calculateShadow();

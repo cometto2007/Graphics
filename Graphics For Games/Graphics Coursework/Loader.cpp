@@ -25,7 +25,11 @@ Loader::Loader()
 	sandWetMap = SOIL_load_OGL_texture(TEXTUREDIR"CI_Beach_Sands_Wet.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	sandMap = SOIL_load_OGL_texture(TEXTUREDIR"CI_Beach_Sands_02.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 
+	grassBumpMap = SOIL_load_OGL_texture(TEXTUREDIR"grassBumpMap.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	cliffsBumpMap = SOIL_load_OGL_texture(TEXTUREDIR"cliffsBumpMap.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
 	SetTextureRepeating(grassTex, true);
+	SetTextureRepeating(grassBumpMap, true);
 	SetTextureRepeating(barkTex, true);
 	SetTextureRepeating(groundTex, true);
 	SetTextureRepeating(cliffsTex, true);

@@ -10,10 +10,12 @@ public:
 	Bird(const MD5FileData& ofType, float speed);
 
 	virtual void Draw(const OGLRenderer& r);
+	virtual void Update(float msec);
 
 	float getSpeed() { return speed; }
-	void setSpeed() { this->speed = speed; }
+	void setSpeed(float speed) { this->speed = speed; }
 private:
 	float speed;
+	float RandomFloat(float a, float b);
 };
 
