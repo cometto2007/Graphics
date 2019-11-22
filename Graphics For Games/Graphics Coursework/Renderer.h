@@ -52,6 +52,7 @@ protected:
 	Shader* calcShadowGrassField;
 	Shader* processShader;
 	Shader* postProcessShader;
+	Shader* birdShadowShader;
 	Shader* animationShader;
 
 	Camera* camera;

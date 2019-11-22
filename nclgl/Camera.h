@@ -25,31 +25,6 @@ struct CameraData {
 	Vector3 position;
 };
 
-struct CameraData2 {
-	Vector3 direction;
-	Vector3 position;
-
-	CameraData2(Vector3 direction, Vector3 position) {
-		this->direction = direction;
-		this->position = position;
-	}
-
-	CameraData2() : position{ 10,10,10 } {
-		direction.ToZero();
-	}
-
-	CameraData2(const CameraData2& x) {
-		direction = x.direction;
-		position = x.position;
-	}
-
-	CameraData2& operator=(const CameraData2& x) {
-		direction = x.direction;
-		position = x.position;
-		return *this;
-	}
-};
-
 class Camera	{
 public:
 	Camera(void){
@@ -112,28 +87,12 @@ public:
 		this->position = data.position;
 	}
 
-	bool isCam2Active = false;
-	CameraData2 cam2;
-
-	void setData2(const CameraData2& data) {
-		cam2 = data;
-		isCam2Active = true;
-	}
-
 	void addCameraConf(CameraData cd) { cameraConfs.push_back(cd); };
-	void addCameraConf2(const Vector3& a, const  Vector3& b) { cameraConfs2.emplace_back(a, b); };
 	void incrCameraIndex() { cameraConfsIndex++; };
 	void setCameraIndex(int index) { 
-		/*if (index <= cameraConfs.size() - 1) {
-			cameraConfsIndex = index;
-			setData(cameraConfs[index]);
-		}*/
 		cameraConfsIndex = index;
-#if 1
 		setData(cameraConfs[index]);
-#else
-		setData2(cameraConfs2[index]);
-#endif
+
 	};
 	int getCameraIndex() { return cameraConfsIndex; };
 	void setCameraSpeed(int speed) { this->speed = speed; };
@@ -153,7 +112,6 @@ protected:
 	Vector3 position;
 
 	vector<CameraData> cameraConfs;
-	vector<CameraData2> cameraConfs2;
 	int cameraConfsIndex;
 	int countFrame;
 	float speed;

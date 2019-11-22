@@ -24,6 +24,9 @@ public:
 	Shader* GetShader() const { return shader; }
 	void SetShader(Shader* s) { shader = s; }
 
+	Shader* GetShadowShader() const { return shadowShader; }
+	void SetShadowShader(Shader* s) { shadowShader = s; }
+
 	Mesh* GetMesh() const { return mesh; }
 	void SetMesh(Mesh* m) { mesh = m; }
 
@@ -57,6 +60,7 @@ protected:
 	Vector3 modelScale;
 	Vector4 colour;
 	Shader* shader;
+	Shader* shadowShader;
 	std::vector<SceneNode*> children;
 
 	float distanceFromCamera;

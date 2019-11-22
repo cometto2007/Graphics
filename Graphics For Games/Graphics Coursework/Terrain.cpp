@@ -110,7 +110,6 @@ void Terrain::Draw(const OGLRenderer& r)
 	Loader loader = Loader::getInstance();
 	updateHeight();
 
-	//glUniform3fv(glGetUniformLocation(r.GetCurrentShader()->GetProgram(), "cameraPos"), 1, (float*)&r.getcamera->GetPosition());
 	glUniform1f(glGetUniformLocation(r.GetCurrentShader()->GetProgram(), "height"), getHeight());
 	r.BindTextureToSamplerAndUniform(0, loader.getGroundTex(), "diffuseTex", r.GetCurrentShader(), GL_TEXTURE_2D);
 	r.BindTextureToSamplerAndUniform(1, loader.getBumpMap(), "bumpTex", r.GetCurrentShader(), GL_TEXTURE_2D);
@@ -133,12 +132,4 @@ void Terrain::Draw(const OGLRenderer& r)
 		glDrawArrays(type, 0, numVertices);
 	}
 	glBindVertexArray(0);
-	//r.BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", currentShader, GL_TEXTURE_2D);
-
-	//modelMatrix.ToIdentity();
-	//textureMatrix.ToIdentity();
-	//UpdateShaderMatrices();
-	//Matrix4 tempMatrix = shadowMatrix * modelMatrix;
-	//glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
-	//terrain->Draw();
 }

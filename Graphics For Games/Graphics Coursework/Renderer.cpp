@@ -42,6 +42,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	postProcessShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_texturedFragment.glsl");
 	processShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_processfrag.glsl");
 	animationShader = new Shader(SHADERDIR"skeletonvertex.glsl", SHADERDIR"TexturedFragment.glsl");
+	birdShadowShader = new Shader(SHADERDIR"birdShadowVertex.glsl", SHADERDIR"birdShadowFragment.glsl");
 
 	if (!reflectShader->LinkProgram() ||
 		!skyboxShader->LinkProgram() ||
@@ -54,7 +55,8 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 		!calcShadowGrassField->LinkProgram() ||
 		!processShader->LinkProgram() ||
 		!postProcessShader->LinkProgram() ||
-		!animationShader->LinkProgram()) {
+		!animationShader->LinkProgram() ||
+		!birdShadowShader->LinkProgram()) {
 		return;
 	}
 
@@ -196,9 +198,10 @@ void Renderer::DrawSkybox()
 void Renderer::DrawNode(SceneNode* node, bool isShadow)
 {
 	if (node->GetMesh() || node->getObjMesh()) {
-		if (node->GetShader()) {
+		if ((node->GetShader() && !isShadow) || (node->GetShadowShader() && isShadow)) {
 			SetShaderLight(*light);
 			if (!isShadow) SetCurrentShader(node->GetShader());
+			else SetCurrentShader(node->GetShadowShader());
 			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
 			UpdateShaderMatrices();
@@ -272,22 +275,24 @@ void Renderer::configureScene()
 	for (int i = 0; i < 100; i++) {
 		Tree* tree = new Tree();
 		tree->SetShader(testShader);
+		tree->SetShadowShader(calcShadowGrassField);
 		tree->SetModelScale(Vector3(scale, scale, scale));
 		tree->SetTransform(Matrix4::Translation(Vector3(RandomFloat(-heightX, heightX), 0, RandomFloat(-heightZ, heightZ))));
 
 		root->AddChild(tree);
 	}
 
-	scale = 0.2f;
+	scale = 0.1f;
 	birds = new SceneNode();
 	birds->SetTransform(Matrix4::Translation(Vector3(RAW_WIDTH * HEIGHTMAP_X / 2.0f, 2500.0f, 0)));
 	birds->SetShader(testShader);
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 10; i++) {
 		Bird* bird = new Bird(*loader.getBirdData(), RandomFloat(0.4f, 0.6f));
 		bird->SetShader(animationShader);
+		bird->SetShadowShader(birdShadowShader);
 		bird->SetModelScale(Vector3(scale, scale, scale));
 		bird->SetTransform(Matrix4::Rotation(-90, Vector3(1.0f, 0.0f, 0.0f)) * Matrix4::Rotation(90, Vector3(0.0f, 0.0f, 1.0f)) * 
-			Matrix4::Translation(Vector3(RandomFloat(-30, 30.0f), RandomFloat(0, 30.0f), RandomFloat(-200.0f, 200.0f))));
+			Matrix4::Translation(Vector3(RandomFloat(-80, 80.0f), RandomFloat(0, 50.0f), RandomFloat(-200.0f, 200.0f))));
 		birds->AddChild(bird);
 	}
 
@@ -333,7 +338,6 @@ void Renderer::DrawShadowScene() {
 	DrawTerrain();
 	SetCurrentShader(shadowShader);
 	DrawWater();
-	SetCurrentShader(calcShadowGrassField);
 	DrawNode(root, true);
 
 	viewMatrix = camera->BuildViewMatrix();
