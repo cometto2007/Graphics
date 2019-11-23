@@ -37,6 +37,37 @@ Loader::Loader()
 	SetTextureRepeating(sandTex, true);
 	SetTextureRepeating(bumpMap, true);
 	SetTextureRepeating(waterTex, true);
+
+	reflectShader = new Shader(SHADERDIR"PerPixelVertex.glsl", SHADERDIR "reflectFragment.glsl");
+	skyboxShader = new Shader(SHADERDIR "skyboxVertex.glsl", SHADERDIR "skyboxFragment.glsl");
+	lightShader = new Shader(SHADERDIR "bumpVertex.glsl", SHADERDIR "bumpFragment.glsl");
+	sceneNodeShadowShader = new Shader(SHADERDIR "sceneNodeShadowVertex.glsl", SHADERDIR "shadowFrag.glsl");
+	shadowShader = new Shader(SHADERDIR"shadowVert.glsl", SHADERDIR"shadowFrag.glsl");
+	sceneShader = new Shader(SHADERDIR"shadowscenevert.glsl", SHADERDIR"shadowscenefrag.glsl");
+	testShader = new Shader(SHADERDIR "BVertex.glsl", SHADERDIR "BFragment.glsl");
+	test1Shader = new Shader(SHADERDIR "terrainVertex.glsl", SHADERDIR "terrainFragment.glsl");
+	calcShadowGrassField = new Shader(SHADERDIR "shadowGrassFieldVert.glsl", SHADERDIR "shadowGrassFieldFrag.glsl");
+
+	postProcessShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_texturedFragment.glsl");
+	processShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_processfrag.glsl");
+	animationShader = new Shader(SHADERDIR"skeletonvertex.glsl", SHADERDIR"TexturedFragment.glsl");
+	birdShadowShader = new Shader(SHADERDIR"birdShadowVertex.glsl", SHADERDIR"birdShadowFragment.glsl");
+
+	if (!reflectShader->LinkProgram() ||
+		!skyboxShader->LinkProgram() ||
+		!lightShader->LinkProgram() ||
+		!testShader->LinkProgram() ||
+		!shadowShader->LinkProgram() ||
+		!sceneShader->LinkProgram() ||
+		!test1Shader->LinkProgram() ||
+		!sceneNodeShadowShader->LinkProgram() ||
+		!calcShadowGrassField->LinkProgram() ||
+		!processShader->LinkProgram() ||
+		!postProcessShader->LinkProgram() ||
+		!animationShader->LinkProgram() ||
+		!birdShadowShader->LinkProgram()) {
+		return;
+	}
 }
 
 void Loader::SetTextureRepeating(GLuint target, bool repeating) {

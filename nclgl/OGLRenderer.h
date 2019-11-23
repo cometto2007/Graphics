@@ -148,6 +148,8 @@ protected:
 	HGLRC	renderContext;	//Permanent Rendering Context
 
 	static DebugDrawData* orthoDebugData;
+
+protected:
 	static DebugDrawData* perspectiveDebugData;
 
 	static OGLRenderer*	  debugDrawingRenderer;

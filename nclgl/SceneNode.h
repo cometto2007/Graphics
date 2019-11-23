@@ -54,6 +54,18 @@ public:
 protected:
 	SceneNode* parent;
 	Mesh* mesh;
+public:
+	Matrix4 texture_matrix() const
+	{
+		return textureMatrix;
+	}
+
+	void set_texture_matrix(const Matrix4& texture_matrix)
+	{
+		textureMatrix = texture_matrix;
+	}
+
+protected:
 	OBJMesh* objMesh;
 	Matrix4 worldTransform;
 	Matrix4 transform;
@@ -62,6 +74,8 @@ protected:
 	Shader* shader;
 	Shader* shadowShader;
 	std::vector<SceneNode*> children;
+
+	Matrix4 textureMatrix;
 
 	float distanceFromCamera;
 	float boundingRadius;

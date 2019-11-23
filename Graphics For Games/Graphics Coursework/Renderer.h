@@ -6,6 +6,8 @@
 #include "Tree.h"
 #include "Bird.h"
 #include "Loader.h"
+#include "Utility.h"
+#include "Water.h"
 #include <stdlib.h>
 #include "Terrain.h"
 #define SHADOWSIZE 2048
@@ -41,20 +43,6 @@ public:
 protected:
 	Loader loader = Loader::getInstance();
 
-	Shader* lightShader;
-	Shader* reflectShader;
-	Shader* skyboxShader;
-	Shader* testShader;
-	Shader* shadowShader;
-	Shader* sceneShader;
-	Shader* test1Shader;
-	Shader* sceneNodeShadowShader;
-	Shader* calcShadowGrassField;
-	Shader* processShader;
-	Shader* postProcessShader;
-	Shader* birdShadowShader;
-	Shader* animationShader;
-
 	Camera* camera;
 	Camera* camera2;
 	Terrain* terrain;
@@ -62,6 +50,7 @@ protected:
 	Mesh* rainDrop;
 	Mesh* quadPost;
 	SceneNode* cube;
+	SceneNode* water;
 	Light* light;
 	Light* light2;
 	SceneNode* root;
@@ -95,8 +84,6 @@ protected:
 	void configureScene();
 	void configureShadow();
 	void configurePostProcessing();
-
-	float RandomFloat(float a, float b);
 };
 
 

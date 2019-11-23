@@ -1,6 +1,7 @@
 #pragma once
 #include "../../nclgl/MD5Mesh.h"
-#include "../../nclgl/MD5Mesh.h"
+#include "Utility.h"
+
 #include "Loader.h"
 
 class Bird :
@@ -15,7 +16,7 @@ public:
 	float getSpeed() { return speed; }
 	void setSpeed(float speed) { this->speed = speed; }
 private:
+	Loader loader = loader.getInstance();
 	float speed;
-	float RandomFloat(float a, float b);
 };
 

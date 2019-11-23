@@ -27,7 +27,7 @@ protected:
 	Shader * combineShader; // shader to stick it all together
 	
 	Light * pointLights; // Array of lighting data
-	Mesh * heightMap; // Terrain !
+	Mesh * heightMap; // TerrainMesh !
 	OBJMesh * sphere; // Light volume
 	Mesh * quad; // To draw a full - screen quad
 	Camera * camera; // Our usual camera

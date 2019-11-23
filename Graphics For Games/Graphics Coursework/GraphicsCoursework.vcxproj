@@ -13,17 +13,25 @@
   <ItemGroup>
     <ClCompile Include="Bird.cpp" />
     <ClCompile Include="Coursework.cpp" />
+    <ClCompile Include="Landscape.cpp" />
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainMesh.cpp" />
     <ClCompile Include="Tree.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="Water.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bird.h" />
+    <ClInclude Include="Landscape.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainMesh.h" />
     <ClInclude Include="Tree.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="Water.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{909A2CFC-6E55-4776-8B60-93B44103A9CF}</ProjectGuid>

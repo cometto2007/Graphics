@@ -29,47 +29,16 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	
 	light = new Light(Vector3(LIGHT_X, LIGHT_Y, LIGHT_Z), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.05f);
 
-	reflectShader = new Shader(SHADERDIR"PerPixelVertex.glsl", SHADERDIR "reflectFragment.glsl");
-	skyboxShader = new Shader(SHADERDIR "skyboxVertex.glsl", SHADERDIR "skyboxFragment.glsl");
-	lightShader = new Shader(SHADERDIR "bumpVertex.glsl", SHADERDIR "bumpFragment.glsl");
-	sceneNodeShadowShader = new Shader(SHADERDIR "sceneNodeShadowVertex.glsl", SHADERDIR "shadowFrag.glsl");
-	shadowShader = new Shader(SHADERDIR"shadowVert.glsl", SHADERDIR"shadowFrag.glsl");
-	sceneShader = new Shader(SHADERDIR"shadowscenevert.glsl", SHADERDIR"shadowscenefrag.glsl");
-	testShader = new Shader(SHADERDIR "BVertex.glsl", SHADERDIR "BFragment.glsl");
-	test1Shader = new Shader(SHADERDIR "terrainVertex.glsl", SHADERDIR "terrainFragment.glsl"); 
-	calcShadowGrassField = new Shader(SHADERDIR "shadowGrassFieldVert.glsl", SHADERDIR "shadowGrassFieldFrag.glsl");
-	
-	postProcessShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_texturedFragment.glsl");
-	processShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_processfrag.glsl");
-	animationShader = new Shader(SHADERDIR"skeletonvertex.glsl", SHADERDIR"TexturedFragment.glsl");
-	birdShadowShader = new Shader(SHADERDIR"birdShadowVertex.glsl", SHADERDIR"birdShadowFragment.glsl");
-
-	if (!reflectShader->LinkProgram() ||
-		!skyboxShader->LinkProgram() ||
-		!lightShader->LinkProgram() ||
-		!testShader->LinkProgram() ||
-		!shadowShader->LinkProgram() ||
-		!sceneShader->LinkProgram() ||
-		!test1Shader->LinkProgram() ||
-		!sceneNodeShadowShader->LinkProgram() ||
-		!calcShadowGrassField->LinkProgram() ||
-		!processShader->LinkProgram() ||
-		!postProcessShader->LinkProgram() ||
-		!animationShader->LinkProgram() ||
-		!birdShadowShader->LinkProgram()) {
-		return;
-	}
-
-	configureScene();
-	configureShadow();
-	configurePostProcessing();
-
 	quad->setTexture(loader.getWaterTex());
 	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
 		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
 		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
 		SOIL_LOAD_RGB,
 		SOIL_CREATE_NEW_ID, 0);
+
+	configureScene();
+	configureShadow();
+	configurePostProcessing();
 
 	if (!cubeMap || !quad->GetTexture()) {
 		return;
@@ -90,13 +59,7 @@ Renderer::~Renderer(void) {
 	delete terrain;
 	delete quad;
 	delete quadPost;
-	delete reflectShader;
-	delete skyboxShader;
-	delete lightShader;
 	delete light;
-
-	delete testShader;
-	delete shadowShader;
 	currentShader = 0;
 
 	glDeleteTextures(2, bufferColourTex);
@@ -133,7 +96,6 @@ void Renderer::UpdateScene(float msec) {
 	camera->moveCameraAuto(msec);
 	//camera2->moveCameraAuto(msec);
 	viewMatrix = camera->BuildViewMatrix();
-	waterRotate += msec / 5000.0f; 
 	root->Update(msec);
 }
 
@@ -157,34 +119,11 @@ void Renderer::DrawRain()
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z);
 
 	for (size_t i = 0; i < 1000; i++) {
-		modelMatrix = Matrix4::Translation(Vector3(RandomFloat(-heightX, heightX), RandomFloat(0, 10000.0f), RandomFloat(-heightZ, heightZ))) *
+		modelMatrix = Matrix4::Translation(Vector3(Utility::RandomFloat(-heightX, heightX), Utility::RandomFloat(0, 10000.0f), Utility::RandomFloat(-heightZ, heightZ))) *
 			Matrix4::Scale(Vector3(5, 30, 20));
 		UpdateShaderMatrices();
 		rainDrop->Draw();
 	}
-}
-
-void Renderer::DrawWater()
-{
-	SetShaderLight(*light);
-	BindTextureToSamplerAndUniform(0, loader.getGroundTex(), "diffuseTex", currentShader, GL_TEXTURE_2D);
-	BindTextureToSamplerAndUniform(2, cubeMap, "cubeTex", currentShader, GL_TEXTURE_CUBE_MAP);
-	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
-
-	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightY = 1550 * HEIGHTMAP_Y / 2.0f;
-	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
-
-	modelMatrix = Matrix4::Translation(Vector3(heightX, heightY, heightZ)) *
-		Matrix4::Scale(Vector3(heightX*10, 1, heightZ*10)) * Matrix4::Rotation(90, Vector3(1.0f, 0.0f, 0.0f));
-	textureMatrix = Matrix4::Scale(Vector3(10.0f, 10.0f, 10.0f)) * Matrix4::Rotation(waterRotate, Vector3(0.0f, 0.0f, 1.0f));
-
-
-	UpdateShaderMatrices();
-	Matrix4 tempMatrix = shadowMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
-
-	quad->Draw();
 }
 
 void Renderer::DrawSkybox()
@@ -203,7 +142,9 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			if (!isShadow) SetCurrentShader(node->GetShader());
 			else SetCurrentShader(node->GetShadowShader());
 			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
 			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
+			textureMatrix = node->texture_matrix();
 			UpdateShaderMatrices();
 
 			Matrix4 tempMatrix = shadowMatrix * modelMatrix;
@@ -267,36 +208,40 @@ void Renderer::configureScene()
 {
 	root = new SceneNode();
 
-	float heightX = (RAW_WIDTH * HEIGHTMAP_X / 2.0f);
-	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z / 2.0f);
-	root->SetTransform(Matrix4::Translation(Vector3(heightX, 0, heightZ)));
-	root->SetShader(testShader);
+	float heightX = (RAW_WIDTH * HEIGHTMAP_X);
+	root->SetTransform(Matrix4::Translation(Vector3(0, 0, 0)));
+	root->SetShader(loader.test_shader());
 	float scale = 80.0f;
 	for (int i = 0; i < 100; i++) {
 		Tree* tree = new Tree();
-		tree->SetShader(testShader);
-		tree->SetShadowShader(calcShadowGrassField);
 		tree->SetModelScale(Vector3(scale, scale, scale));
-		tree->SetTransform(Matrix4::Translation(Vector3(RandomFloat(-heightX, heightX), 0, RandomFloat(-heightZ, heightZ))));
+		tree->SetTransform(Matrix4::Translation(Vector3(Utility::RandomFloat(0, heightX), 0, Utility::RandomFloat(0, heightX))));
 
 		root->AddChild(tree);
 	}
 
 	scale = 0.1f;
 	birds = new SceneNode();
-	birds->SetTransform(Matrix4::Translation(Vector3(RAW_WIDTH * HEIGHTMAP_X / 2.0f, 2500.0f, 0)));
-	birds->SetShader(testShader);
-	for (int i = 0; i < 10; i++) {
-		Bird* bird = new Bird(*loader.getBirdData(), RandomFloat(0.4f, 0.6f));
-		bird->SetShader(animationShader);
-		bird->SetShadowShader(birdShadowShader);
+	birds->SetTransform(Matrix4::Translation(Vector3(heightX, 2500.0f, heightX)));
+	birds->SetShader(loader.test_shader());
+	for (int i = 0; i < 15; i++) {
+		Bird* bird = new Bird(*loader.getBirdData(), Utility::RandomFloat(0.4f, 0.6f));
 		bird->SetModelScale(Vector3(scale, scale, scale));
-		bird->SetTransform(Matrix4::Rotation(-90, Vector3(1.0f, 0.0f, 0.0f)) * Matrix4::Rotation(90, Vector3(0.0f, 0.0f, 1.0f)) * 
-			Matrix4::Translation(Vector3(RandomFloat(-80, 80.0f), RandomFloat(0, 50.0f), RandomFloat(-200.0f, 200.0f))));
+		bird->SetTransform(Matrix4::Rotation(-90, Vector3(1.0f, 0.0f, 0.0f)) * Matrix4::Rotation(90, Vector3(0.0f, 0.0f, 1.0f)) *
+			Matrix4::Translation(Vector3(heightX / 2, 0, Utility::RandomFloat(0, 50.0f))));
 		birds->AddChild(bird);
 	}
 
 	root->AddChild(birds);
+
+	Water* water = new Water(cubeMap);
+	water->SetModelScale(Vector3(heightX / 2.0f *10, heightX / 2.0f * 10, 1));
+	water->SetTransform(Matrix4::Translation(Vector3(heightX / 2.0f, 1550 * HEIGHTMAP_Y / 2.0f, heightX / 2.0f)) * Matrix4::Rotation(90, Vector3(1.0f, 0.0f, 0.0f)));
+
+	root->AddChild(water);
+	terrain->SetTransform(Matrix4::Translation(Vector3(0, 0, 0)));
+
+	root->AddChild(terrain);
 }
 
 void Renderer::configureShadow()
@@ -334,10 +279,9 @@ void Renderer::DrawShadowScene() {
 
 	UpdateShaderMatrices();
 
-	SetCurrentShader(test1Shader);
-	DrawTerrain();
-	SetCurrentShader(shadowShader);
-	DrawWater();
+	//SetCurrentShader(loader.test1_shader());
+	//DrawTerrain();
+	SetCurrentShader(loader.shadow_shader());
 	DrawNode(root, true);
 
 	viewMatrix = camera->BuildViewMatrix();
@@ -350,14 +294,12 @@ void Renderer::DrawShadowScene() {
 }
 
 void Renderer::DrawCombinedScene() {
-	SetCurrentShader(skyboxShader);
+	SetCurrentShader(loader.skybox_shader());
 	DrawSkybox();
-	SetCurrentShader(lightShader);
-	DrawTerrain();
-	SetCurrentShader(reflectShader);
-	DrawWater();
+	SetCurrentShader(loader.light_shader());
+	//DrawTerrain();
 	DrawNode(root, false);
-	SetCurrentShader(postProcessShader);
+	SetCurrentShader(loader.post_process_shader());
 	DrawRain();
 	glUseProgram(0);
 }
@@ -380,7 +322,7 @@ void Renderer::DrawPostProcess()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	SetCurrentShader(processShader);
+	SetCurrentShader(loader.process_shader());
 	projMatrix = Matrix4::Orthographic(-1, 1, 1, -1, 1, -1);
 	viewMatrix.ToIdentity();
 	modelMatrix.ToIdentity();
@@ -409,18 +351,11 @@ void Renderer::PresentScene()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	SetCurrentShader(postProcessShader);
+	SetCurrentShader(loader.post_process_shader());
 	projMatrix = Matrix4::Orthographic(-1, 1, 1, -1, -1, 1);
 	viewMatrix.ToIdentity();
 	UpdateShaderMatrices();
 	quadPost->setTexture(bufferColourTex[0]);
 	quadPost->Draw();
 	glUseProgram(0);
-}
-
-float Renderer::RandomFloat(float a, float b) {
-	float random = ((float)rand()) / (float)RAND_MAX;
-	float diff = b - a;
-	float r = random * diff;
-	return a + r;
 }

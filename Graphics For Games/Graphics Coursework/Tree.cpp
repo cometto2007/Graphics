@@ -2,12 +2,14 @@
 
 Tree::Tree()
 {
-	Loader l = Loader::getInstance();
-	objMesh = l.getTree();
+	objMesh = loader.getTree();
 	vector<Mesh*> childs = objMesh->getChilds();
 
-	objMesh->setTexture(l.getSandText());
-	childs[0]->setTexture(l.getGrassTex());
+	objMesh->setTexture(loader.getSandText());
+	childs[0]->setTexture(loader.getGrassTex());
+
+	shader = loader.test_shader();
+	shadowShader = loader.calc_shadow_grass_field();
 }
 
 void Tree::Draw(const OGLRenderer& r)

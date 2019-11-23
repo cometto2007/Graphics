@@ -5,6 +5,7 @@ SceneNode::SceneNode(Mesh* m, Vector4 colour, OBJMesh* mesh)
 	this->mesh = m;
 	this->objMesh = mesh;
 	this->colour = colour;
+	this->textureMatrix.ToIdentity();
 	boundingRadius = 1.0f;
 	distanceFromCamera = 0.0f;
 	parent = NULL;

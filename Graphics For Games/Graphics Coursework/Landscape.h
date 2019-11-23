@@ -1,14 +1,11 @@
 #pragma once
 #include "../../nclgl/SceneNode.h"
 #include "Loader.h"
-#include "Renderer.h"
-class Tree :
+class Landscape :
 	public SceneNode
 {
 public:
-	Tree();
-
-	virtual void Draw(const OGLRenderer& r);
+	Landscape();
 private:
 	Loader loader = Loader::getInstance();
 };
