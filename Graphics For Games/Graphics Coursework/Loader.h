@@ -28,6 +28,7 @@ public:
 	GLuint getWaterTex() { return waterTex; };
 	GLuint getGrassBumpMap() { return grassBumpMap; };
 	GLuint getCliffsBumpMap() { return cliffsBumpMap; };
+	GLuint getSkyBox() { return skyBox; };
 	Shader* light_shader() const { return lightShader; }
 	Shader* reflect_shader() const { return reflectShader; }
 	Shader* skybox_shader() const { return skyboxShader; }
@@ -69,6 +70,7 @@ private:
 	GLuint sandWetMap;
 	GLuint sandMap;
 	GLuint bumpMap;
+	GLuint skyBox;
 
 	GLuint cliffsTex;
 	GLuint sandWetTex;

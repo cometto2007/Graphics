@@ -2,15 +2,14 @@
 #include "../../nclgl/SceneNode.h"
 #include "Loader.h"
 #include "Terrain.h"
+#include "Skybox.h"
+#include "Tree.h"
 
-
-class Landscape :
+class Scenary :
 	public SceneNode
 {
 public:
-	Landscape();
-
-	Terrain* get_terrain() { return terrain; };
+	Scenary();
 
 private:
 	Loader loader = Loader::getInstance();

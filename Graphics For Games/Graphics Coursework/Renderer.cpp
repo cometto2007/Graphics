@@ -1,26 +1,11 @@
 #include "Renderer.h"
+#include "Utility.h"
 
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
-	//terrain = new Terrain(0.25f, 3000.0f, 1500.f);
-	terrain = new Terrain(0.25f, 3000.0f, 3000.f);
+	root = new Landscape();
+	camera = new Camera({ -7.86, 355.75, Vector3(5344, 8476, 74991) });
 
-	camera = new Camera({ -41.54, 0.58, Vector3(8034, 11979, 21759) });
-	camera->addCameraConf({ -41.54, 0.58, Vector3(8034, 11979, 21759) });
-	camera->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
-	camera->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
-
-	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 2252.96f), Vector3(8034, 11979, 21759) );
-	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 3000.0f), Vector3(1295.94f, 6551.4f, 2252.96f));
-	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 3000.0f), Vector3(-2100, 3300, 2000));
-
-	/*camera2 = new Camera({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
-	camera2->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
-	camera2->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
-	camera2->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });*/
-
-	quad = Mesh::GenerateQuad();
 	quadPost = Mesh::GenerateQuad();
-
 	rainDrop = Mesh::GenerateQuad();
 	rainDrop->setTexture(loader.getWaterTex());
 
@@ -29,21 +14,10 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	
 	light = new Light(Vector3(LIGHT_X, LIGHT_Y, LIGHT_Z), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.05f);
 
-	quad->setTexture(loader.getWaterTex());
-	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
-		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
-		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
-		SOIL_LOAD_RGB,
-		SOIL_CREATE_NEW_ID, 0);
-
-	configureScene();
 	configureShadow();
 	configurePostProcessing();
+	configureCameraPositions();
 
-	if (!cubeMap || !quad->GetTexture()) {
-		return;
-	}
-	waterRotate = 0.0f;
 	projMatrix = Matrix4::Perspective(1.0f, 50000.0f, (float)width / (float)height, 45.0f);
 
 	glEnable(GL_DEPTH_TEST);
@@ -56,11 +30,9 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 
 Renderer::~Renderer(void) {
 	delete camera;
-	delete terrain;
-	delete quad;
 	delete quadPost;
 	delete light;
-	currentShader = 0;
+	currentShader = nullptr;
 
 	glDeleteTextures(2, bufferColourTex);
 	glDeleteTextures(1, &bufferDepthTex);
@@ -93,24 +65,18 @@ void Renderer::UpdateScene(float msec) {
 	// TODO: add if
 	camera->UpdateCamera(msec);
 	//camera2->UpdateCamera(msec);
-	camera->moveCameraAuto(msec);
+	if (camera->getAutoCam()) {
+		CameraEffects effects = camera->moveCameraAuto(msec);
+		if (effects.isBlur != this->isBlur) {
+			this->toggleBlur();
+		}
+		if (effects.isSplitScreen != this->isSplitScreen) {
+			this->toggleSplitScreen();
+		}
+	}
 	//camera2->moveCameraAuto(msec);
 	viewMatrix = camera->BuildViewMatrix();
 	root->Update(msec);
-}
-
-void Renderer::DrawTerrain()
-{
-	SetShaderLight(*light);
-	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
-	
-	BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", currentShader, GL_TEXTURE_2D);
-	modelMatrix.ToIdentity();
-	textureMatrix.ToIdentity();
-	UpdateShaderMatrices();
-	Matrix4 tempMatrix = shadowMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
-	terrain->Draw(*this);
 }
 
 void Renderer::DrawRain()
@@ -126,21 +92,15 @@ void Renderer::DrawRain()
 	}
 }
 
-void Renderer::DrawSkybox()
-{
-	glDepthMask(GL_FALSE);
-	UpdateShaderMatrices();
-	quad->Draw();
-	glDepthMask(GL_TRUE);
-}
-
 void Renderer::DrawNode(SceneNode* node, bool isShadow)
 {
 	if (node->GetMesh() || node->getObjMesh()) {
 		if ((node->GetShader() && !isShadow) || (node->GetShadowShader() && isShadow)) {
-			SetShaderLight(*light);
 			if (!isShadow) SetCurrentShader(node->GetShader());
 			else SetCurrentShader(node->GetShadowShader());
+			SetShaderLight(*light);
+			
+			
 			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
 			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
@@ -150,7 +110,7 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			Matrix4 tempMatrix = shadowMatrix * modelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
 			BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", GetCurrentShader(), GL_TEXTURE_2D);
-			glUniform1f(glGetUniformLocation(GetCurrentShader()->GetProgram(), "height"), terrain->getHeight());
+			glUniform1f(glGetUniformLocation(GetCurrentShader()->GetProgram(), "height"), root->get_terrain()->getHeight());
 			
 			node->Draw(*this);
 		}
@@ -159,8 +119,6 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 		DrawNode(*i, isShadow);
 	}
 }
-
-
 
 // TODO: delete
 void Renderer::moveLight(float x, float y, float z)
@@ -204,46 +162,6 @@ void Renderer::configurePostProcessing()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Renderer::configureScene()
-{
-	root = new SceneNode();
-
-	float heightX = (RAW_WIDTH * HEIGHTMAP_X);
-	root->SetTransform(Matrix4::Translation(Vector3(0, 0, 0)));
-	root->SetShader(loader.test_shader());
-	float scale = 80.0f;
-	for (int i = 0; i < 100; i++) {
-		Tree* tree = new Tree();
-		tree->SetModelScale(Vector3(scale, scale, scale));
-		tree->SetTransform(Matrix4::Translation(Vector3(Utility::RandomFloat(0, heightX), 0, Utility::RandomFloat(0, heightX))));
-
-		root->AddChild(tree);
-	}
-
-	scale = 0.1f;
-	birds = new SceneNode();
-	birds->SetTransform(Matrix4::Translation(Vector3(heightX, 2500.0f, heightX)));
-	birds->SetShader(loader.test_shader());
-	for (int i = 0; i < 15; i++) {
-		Bird* bird = new Bird(*loader.getBirdData(), Utility::RandomFloat(0.4f, 0.6f));
-		bird->SetModelScale(Vector3(scale, scale, scale));
-		bird->SetTransform(Matrix4::Rotation(-90, Vector3(1.0f, 0.0f, 0.0f)) * Matrix4::Rotation(90, Vector3(0.0f, 0.0f, 1.0f)) *
-			Matrix4::Translation(Vector3(heightX / 2, 0, Utility::RandomFloat(0, 50.0f))));
-		birds->AddChild(bird);
-	}
-
-	root->AddChild(birds);
-
-	Water* water = new Water(cubeMap);
-	water->SetModelScale(Vector3(heightX / 2.0f *10, heightX / 2.0f * 10, 1));
-	water->SetTransform(Matrix4::Translation(Vector3(heightX / 2.0f, 1550 * HEIGHTMAP_Y / 2.0f, heightX / 2.0f)) * Matrix4::Rotation(90, Vector3(1.0f, 0.0f, 0.0f)));
-
-	root->AddChild(water);
-	terrain->SetTransform(Matrix4::Translation(Vector3(0, 0, 0)));
-
-	root->AddChild(terrain);
-}
-
 void Renderer::configureShadow()
 {
 	glGenTextures(1, &shadowTex);
@@ -278,9 +196,6 @@ void Renderer::DrawShadowScene() {
 	shadowMatrix = biasMatrix * (projMatrix * viewMatrix);
 
 	UpdateShaderMatrices();
-
-	//SetCurrentShader(loader.test1_shader());
-	//DrawTerrain();
 	SetCurrentShader(loader.shadow_shader());
 	DrawNode(root, true);
 
@@ -294,10 +209,6 @@ void Renderer::DrawShadowScene() {
 }
 
 void Renderer::DrawCombinedScene() {
-	SetCurrentShader(loader.skybox_shader());
-	DrawSkybox();
-	SetCurrentShader(loader.light_shader());
-	//DrawTerrain();
 	DrawNode(root, false);
 	SetCurrentShader(loader.post_process_shader());
 	DrawRain();
@@ -358,4 +269,25 @@ void Renderer::PresentScene()
 	quadPost->setTexture(bufferColourTex[0]);
 	quadPost->Draw();
 	glUseProgram(0);
+}
+
+void Renderer::configureCameraPositions()
+{
+	camera->addCameraConf({ { -15.77, 5, Vector3(5376, 8476, 77322) }, {0.5, false, false} });
+	camera->addCameraConf({ { -7.86, 355.75, Vector3(5344, 8476, 74991) }, {40, true, false} });
+	camera->addCameraConf({ { -38.94, 357.57, Vector3(8073, 8476, 19475) }, {1, false, false} });
+	camera->addCameraConf({ { -47.76, 65.96, Vector3(16887, 8476, 13162) }, {1, false, false} });
+	camera->addCameraConf({ { -40.27, 128.75, Vector3(17825, 8476, 2022) }, {1, false, false} });
+	camera->addCameraConf({ { -35.79, 210.58, Vector3(547, 8476, -2025) }, {1, false, false} });
+	camera->addCameraConf({ { -43.00, 305.57, Vector3(-1588, 8476, 14765) }, {1, false, false} });
+	camera->addCameraConf({ { -41.54, 0.58, Vector3(8034, 11979, 21759) }, {1, false, false} });
+
+	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 2252.96f), Vector3(8034, 11979, 21759) );
+	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 3000.0f), Vector3(1295.94f, 6551.4f, 2252.96f));
+	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 3000.0f), Vector3(-2100, 3300, 2000));
+
+	/*camera2 = new Camera({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
+	camera2->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
+	camera2->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
+	camera2->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });*/
 }

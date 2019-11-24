@@ -15,7 +15,9 @@
     <ClCompile Include="Coursework.cpp" />
     <ClCompile Include="Landscape.cpp" />
     <ClCompile Include="Loader.cpp" />
+    <ClCompile Include="Rain.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainMesh.cpp" />
     <ClCompile Include="Tree.cpp" />
@@ -26,7 +28,9 @@
     <ClInclude Include="Bird.h" />
     <ClInclude Include="Landscape.h" />
     <ClInclude Include="Loader.h" />
+    <ClInclude Include="Rain.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainMesh.h" />
     <ClInclude Include="Tree.h" />
@@ -65,7 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>..\..\GLEW\include;..\..\SOIL;..\nclgl;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\GLEW\lib;..\..\SOIL\$(Configuration);..\$(Configuration)\;..\..\nclgl\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)2</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>..\..\GLEW\include;..\..\SOIL\;..\nclgl;$(IncludePath)</IncludePath>

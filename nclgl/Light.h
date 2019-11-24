@@ -6,6 +6,7 @@
 class Light
 {
 public:
+	Light() {};
 	Light(Vector3 position, Vector4 colour, float radius) {
 		this->position = position;
 		this->colour = colour;
@@ -15,6 +16,7 @@ public:
 
 	Vector3 GetPosition() const { return position; }
 	void SetPosition(Vector3 val) { position = val; }
+	
 	float GetRadius() const { return radius; }
 	void SetRadius(float val) { radius = val; }
 	

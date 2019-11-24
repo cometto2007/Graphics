@@ -1,4 +1,3 @@
-#include "TerrainMesh.h"
 #include "Terrain.h"
 
 Terrain::Terrain(float speed, float maxHeight, float currentHeight)

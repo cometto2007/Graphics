@@ -46,10 +46,10 @@ void Camera::UpdateCamera(float msec)	{
 	if(Window::GetKeyboard()->KeyDown(KEYBOARD_SPACE)) {
 		position.y -= msec;
 	}
-
+	 /*
 	cout << "position: " << position << endl;
 	cout << "yaw: " << yaw << endl;
-	cout << "pitch: " << pitch << endl;
+	cout << "pitch: " << pitch << endl;*/
 }
 
 /*
@@ -64,37 +64,39 @@ Matrix4 Camera::BuildViewMatrix()	{
 			Matrix4::Translation(-position);
 };
 
-void Camera::moveCameraAuto(float msec)
+CameraEffects Camera::moveCameraAuto(float msec)
 {
-	if (autoMov) {
-		CameraData cd1 = cameraConfs[cameraConfsIndex];
-		CameraData cd2 = cameraConfs[cameraConfsIndex + 1];
-		CameraData pos;
-		double distance = (cd1.position - cd2.position).Length();
-		double time = distance / speed;
-		static double currentTime = 0;
-		currentTime += msec;
+	CameraEffects effects = cameraConfs[cameraConfsIndex].effects;
+	CameraData cd1 = cameraConfs[cameraConfsIndex].data;
+	CameraData cd2 = cameraConfs[cameraConfsIndex + 1].data;
+	CameraData pos;
+	double distance = (cd1.position - cd2.position).Length();
+	double time = distance / effects.speed;
+	static double currentTime = 0;
+	currentTime += msec;
 
-		if (currentTime <= time) {
-			double t = currentTime / time;
-			pos.position.x = (t * (double)cd2.position.x) + ((1 - t) * (double)cd1.position.x);
-			pos.position.y = (t * (double)cd2.position.y) + ((1 - t) * (double)cd1.position.y);
-			pos.position.z = (t * (double)cd2.position.z) + ((1 - t) * (double)cd1.position.z);
-			pos.pitch = (t * cd2.pitch) + ((1 - t) * cd1.pitch);
-			pos.yaw = (t * cd2.yaw) + ((1 - t) * cd1.yaw);
-			//pos.pitch = cd1.pitch;
-			//pos.yaw = cd1.yaw;
+	if (currentTime <= time) {
+		double t = currentTime / time;
+		pos.position.x = (t * (double)cd2.position.x) + ((1 - t) * (double)cd1.position.x);
+		pos.position.y = (t * (double)cd2.position.y) + ((1 - t) * (double)cd1.position.y);
+		pos.position.z = (t * (double)cd2.position.z) + ((1 - t) * (double)cd1.position.z);
+		pos.pitch = (t * cd2.pitch) + ((1 - t) * cd1.pitch);
+		
+		pos.yaw = (t * cd2.yaw) + ((1 - t) * cd1.yaw);
+		cout << pos.yaw << endl;
+		//pos.pitch = cd1.pitch;
+		//pos.yaw = cd1.yaw;
 
-			countFrame++;
-			setData(pos);
+		countFrame++;
+		setData(pos);
+	} else {
+		if ((cameraConfsIndex + 1) <= (cameraConfs.size() - 2)) {
+			cameraConfsIndex++;
 		} else {
-			if ((cameraConfsIndex + 1) <= (cameraConfs.size() - 2)) {
-				cameraConfsIndex++;
-			} else {
-				autoMov = false;
-			}
-			countFrame = 0;
-			currentTime = 0;
+			autoMov = false;
 		}
+		countFrame = 0;
+		currentTime = 0;
 	}
+	return effects;
 }

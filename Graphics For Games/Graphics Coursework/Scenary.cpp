@@ -1,13 +1,8 @@
-#include "Landscape.h"
-#include "Skybox.h"
-#include "Tree.h"
-#include "Utility.h"
-#include "Bird.h"
-#include "Water.h"
+#include "Scenary.h"
 
-Landscape::Landscape()
+Scenary::Scenary()
 {
-	terrain = new Terrain(0.5f, 3000.0f, 2000.0f);
+	terrain = new Terrain(0.25f, 3000.0f, 3000.f);
 
 	Skybox* skyBox = new Skybox();
 	AddChild(skyBox);
@@ -41,10 +36,11 @@ Landscape::Landscape()
 
 	Water* water = new Water(skyBox->cube_map());
 	water->SetModelScale(Vector3(heightX / 2.0f * 10, heightX / 2.0f * 10, 1));
-	water->SetTransform(Matrix4::Translation(Vector3(heightX / 2.0f, 1550 * HEIGHTMAP_Y / 2.0f, heightX / 2.0f))* Matrix4::Rotation(90, Vector3(1.0f, 0.0f, 0.0f)));
+	water->SetTransform(Matrix4::Translation(Vector3(heightX / 2.0f, 1550 * HEIGHTMAP_Y / 2.0f, heightX / 2.0f)) * Matrix4::Rotation(90, Vector3(1.0f, 0.0f, 0.0f)));
 
 	skyBox->AddChild(water);
 	terrain->SetTransform(Matrix4::Translation(Vector3(0, 0, 0)));
 
 	skyBox->AddChild(terrain);
 }
+

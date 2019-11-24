@@ -1,15 +1,8 @@
 #pragma once
-#include "../../nclgl/OGLRenderer.h"
 #include "../../nclgl/Camera.h"
-#include "../../nclgl/SceneNode.h"
-#include "../../nclgl/OBJMesh.h"
-#include "Tree.h"
-#include "Bird.h"
+#include "Landscape.h"
 #include "Loader.h"
-#include "Utility.h"
-#include "Water.h"
-#include <stdlib.h>
-#include "Terrain.h"
+
 #define SHADOWSIZE 2048
 #define LIGHT_X 23108
 #define LIGHT_Y 11500
@@ -19,6 +12,7 @@ class Renderer : public OGLRenderer {
 public:
 	int post_passes = 10;
 
+	void configureCameraPositions();
 	Renderer(Window& parent);
 	virtual ~Renderer(void);
 
@@ -42,21 +36,15 @@ public:
 	
 protected:
 	Loader loader = Loader::getInstance();
-
+	Landscape* root;
+	
 	Camera* camera;
 	Camera* camera2;
-	Terrain* terrain;
-	Mesh* quad;
 	Mesh* rainDrop;
 	Mesh* quadPost;
-	SceneNode* cube;
-	SceneNode* water;
 	Light* light;
-	Light* light2;
-	SceneNode* root;
-	SceneNode* birds;
+	
 
-	GLuint cubeMap;
 	GLuint shadowTex;
 	GLuint shadowFBO;
 	GLuint bufferDepthTex;
@@ -67,11 +55,6 @@ protected:
 	bool isSplitScreen;
 	bool isBlur;
 
-	float waterRotate;
-
-	void DrawWater();
-	void DrawSkybox();
-	void DrawTerrain();
 	void DrawRain();
 	void DrawShadowScene();
 	void DrawCombinedScene();
@@ -81,7 +64,6 @@ protected:
 
 	void DrawNode(SceneNode* n, bool isShadow);
 
-	void configureScene();
 	void configureShadow();
 	void configurePostProcessing();
 };

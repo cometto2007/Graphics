@@ -1,6 +1,7 @@
 #pragma once
 #include "../../nclgl/Mesh.h"
 #include "../../nclgl/SceneNode.h"
+#include "TerrainMesh.h"
 #include "Loader.h"
 
 #define RAW_WIDTH 1025

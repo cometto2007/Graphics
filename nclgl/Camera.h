@@ -17,12 +17,21 @@ _-_-_-_-_-_-_-""  ""
 #include "Matrix4.h"
 #include "Vector3.h"
 
-#define SPEED 2.0f
-
 struct CameraData {
 	float pitch;
 	float yaw;
 	Vector3 position;
+};
+
+struct CameraEffects {
+	float speed;
+	bool isBlur;
+	bool isSplitScreen;
+};
+
+struct CameraConf {
+	CameraData data;
+	CameraEffects effects;
 };
 
 class Camera	{
@@ -32,7 +41,6 @@ public:
 		pitch	= 0.0f;
 		cameraConfsIndex = -1;
 		countFrame = 1;
-		speed = SPEED;
 		autoMov = false;
 	};
 
@@ -43,7 +51,6 @@ public:
 
 		cameraConfsIndex = -1;
 		countFrame = 1;
-		speed = SPEED;
 		autoMov = false;
 	}
 
@@ -54,7 +61,6 @@ public:
 
 		cameraConfsIndex = -1;
 		countFrame = 1;
-		speed = SPEED;
 		autoMov = false;
 	}
 
@@ -87,18 +93,17 @@ public:
 		this->position = data.position;
 	}
 
-	void addCameraConf(CameraData cd) { cameraConfs.push_back(cd); };
+	void addCameraConf(CameraConf cd) { cameraConfs.push_back(cd); };
 	void incrCameraIndex() { cameraConfsIndex++; };
 	void setCameraIndex(int index) { 
 		cameraConfsIndex = index;
-		setData(cameraConfs[index]);
-
+		setData(cameraConfs[index].data);
 	};
 	int getCameraIndex() { return cameraConfsIndex; };
-	void setCameraSpeed(int speed) { this->speed = speed; };
 
-	void moveCameraAuto(float msec);
+	CameraEffects moveCameraAuto(float msec);
 	void setAutoCam(bool autoMov) { this->autoMov = autoMov; }
+	bool getAutoCam() { return autoMov; }
 
 	void printData() {
 		cout << "yaw: " << yaw << endl;
@@ -111,9 +116,8 @@ protected:
 	float	pitch;
 	Vector3 position;
 
-	vector<CameraData> cameraConfs;
+	vector<CameraConf> cameraConfs;
 	int cameraConfsIndex;
 	int countFrame;
-	float speed;
 	bool autoMov;
 };
