@@ -120,6 +120,7 @@ public:
 
 protected:
 	void SetShaderLight(const Light& l);
+	void SetShaderLights(const vector<Light*> lights);
 	virtual void	Resize(int x, int y);	
 	void			UpdateShaderMatrices();
 	void			SetCurrentShader(Shader*s);

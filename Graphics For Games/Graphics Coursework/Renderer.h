@@ -44,6 +44,8 @@ protected:
 	Mesh* rainDrop;
 	Mesh* quadPost;
 	Light* light;
+	Light* light2;
+	vector<Light*> lights;
 	
 
 	GLuint shadowTex;
