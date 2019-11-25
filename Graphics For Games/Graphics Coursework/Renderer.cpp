@@ -13,11 +13,7 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	isBlur = false;
 	
 	light = new Light(Vector3(LIGHT_X, LIGHT_Y, LIGHT_Z), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.05f);
-	light2 = new Light(Vector3(LIGHT_X, LIGHT_Y, LIGHT_Z), Vector4(1.0f, 0.0f, 0.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 2.0f);
-
-	
-	lights.push_back(light2);
-	lights.push_back(light);
+	light2 = new Light(Vector3(-13792, 11500, -4092), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.5f);
 
 	configureShadow();
 	configurePostProcessing();
@@ -110,7 +106,7 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			if (!isShadow) SetCurrentShader(node->GetShader());
 			else SetCurrentShader(node->GetShadowShader());
 			SetShaderLight(*light);
-			SetShaderLights(lights);
+			SetShaderLights2(*light, *light2);
 			
 			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
@@ -134,9 +130,9 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 // TODO: delete
 void Renderer::moveLight(float x, float y, float z)
 {
-	Vector3 pos = light2->GetPosition();
-	light2->SetPosition({pos.x + x, pos.y + y, pos.z + z});
-	cout << light2->GetPosition() << endl;
+	Vector3 pos = light->GetPosition();
+	light->SetPosition({pos.x + x, pos.y + y, pos.z + z});
+	cout << light->GetPosition() << endl;
 }
 
 void Renderer::activateSlideshow(bool active)

@@ -140,7 +140,7 @@ void Renderer::RenderScene() {
 	
 	FillBuffers();
 	DrawPointLights();
-	CombineBuffers();
+	//CombineBuffers();
 	SwapBuffers();
 }
 

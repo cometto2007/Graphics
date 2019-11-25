@@ -20,7 +20,6 @@ void Tree::Draw(const OGLRenderer& r)
 	
 	r.BindTextureToSamplerAndUniform(12, l.getGrassMap(), "grassMap", r.GetCurrentShader(), GL_TEXTURE_2D);
 	r.BindTextureToSamplerAndUniform(5, l.getDeptMap(), "deptTex", r.GetCurrentShader(), GL_TEXTURE_2D);
-
 	
 	r.BindTextureToSamplerAndUniform(6, childs[0]->GetTexture(), "diffuseTex", r.GetCurrentShader(), GL_TEXTURE_2D);
 	childs[0]->Draw();

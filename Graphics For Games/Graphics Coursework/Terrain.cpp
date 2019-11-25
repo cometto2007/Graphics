@@ -8,7 +8,7 @@ Terrain::Terrain(float speed, float maxHeight, float currentHeight)
 
 	mesh = new TerrainMesh();
 
-	shader = loader.light_shader();
+	shader = loader.double_light_shader();
 	shadowShader = loader.test1_shader();
 }
 

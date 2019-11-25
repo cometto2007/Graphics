@@ -17,7 +17,6 @@ Loader::Loader()
 	waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	bumpMap = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 
-
 	// Set Map
 	deptMap = SOIL_load_OGL_texture(TEXTUREDIR"heightMap.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	grassMap = SOIL_load_OGL_texture(TEXTUREDIR"CI_Shared_Grass_01.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -52,6 +51,7 @@ Loader::Loader()
 	processShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_processfrag.glsl");
 	animationShader = new Shader(SHADERDIR"skeletonvertex.glsl", SHADERDIR"TexturedFragment.glsl");
 	birdShadowShader = new Shader(SHADERDIR"birdShadowVertex.glsl", SHADERDIR"birdShadowFragment.glsl");
+	doubleLightShader = new Shader(SHADERDIR"DoubleLightVertex.glsl", SHADERDIR"DoubleLightFragment.glsl");
 
 	if (!reflectShader->LinkProgram() ||
 		!skyboxShader->LinkProgram() ||
@@ -65,7 +65,8 @@ Loader::Loader()
 		!processShader->LinkProgram() ||
 		!postProcessShader->LinkProgram() ||
 		!animationShader->LinkProgram() ||
-		!birdShadowShader->LinkProgram()) {
+		!birdShadowShader->LinkProgram() ||
+		!doubleLightShader->LinkProgram()) {
 		return;
 	}
 

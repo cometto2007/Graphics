@@ -188,21 +188,15 @@ void OGLRenderer::SetShaderLight(const Light& l)
 	glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "lightRadius"), l.GetRadius());
 }
 
-void OGLRenderer::SetShaderLights(const vector<Light*> lights)
+void OGLRenderer::SetShaderLights2(const Light& l1, const Light& l2)
 {
-	Vector3 lightPos[2];
-	Vector4 lightColour[2];
-	float lightRadius[2];
-	
-	for (int i = 0; i < 2; i++) {
-		lightPos[i] = lights[i]->GetPosition();
-		lightColour[i] = lights[i]->GetColour();
-		lightRadius[i] = lights[i]->GetRadius();
-	}
+	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "lightPos"), 1, (float*)& l1.GetPosition());
+	glUniform4fv(glGetUniformLocation(currentShader->GetProgram(), "lightColour"), 1, (float*)& l1.GetColour());
+	glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "lightRadius"), l1.GetRadius());
 
-	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "lightPosArr"), 2, (float*)&lightPos[0]);
-	glUniform4fv(glGetUniformLocation(currentShader->GetProgram(), "lightColourArr"), 2, (float*)&lightColour[0]);
-	glUniform1fv(glGetUniformLocation(currentShader->GetProgram(), "lightRadiusArr"), 2, lightRadius);
+	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "lightPos1"), 1, (float*)& l2.GetPosition());
+	glUniform4fv(glGetUniformLocation(currentShader->GetProgram(), "lightColour1"), 1, (float*)& l2.GetColour());
+	glUniform1f(glGetUniformLocation(currentShader->GetProgram(), "lightRadius1"), l2.GetRadius());
 }
 
 void OGLRenderer::Resize(int x, int y)	{

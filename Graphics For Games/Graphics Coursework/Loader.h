@@ -42,6 +42,8 @@ public:
 	Shader* post_process_shader() const { return postProcessShader; }
 	Shader* bird_shadow_shader() const { return birdShadowShader; }
 	Shader* animation_shader() const { return animationShader; }
+	Shader* double_light_shader() const { return doubleLightShader; }
+	
 
 private:
 	Loader();
@@ -61,6 +63,7 @@ private:
 	Shader* postProcessShader;
 	Shader* birdShadowShader;
 	Shader* animationShader;
+	Shader* doubleLightShader;
 
 	GLuint grassTex;
 	GLuint barkTex;
