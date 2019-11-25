@@ -116,6 +116,8 @@ protected:
 	float	pitch;
 	Vector3 position;
 
+	float LerpDegrees(float start, float end, float amount);
+
 	vector<CameraConf> cameraConfs;
 	int cameraConfsIndex;
 	int countFrame;

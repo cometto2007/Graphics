@@ -81,11 +81,7 @@ CameraEffects Camera::moveCameraAuto(float msec)
 		pos.position.y = (t * (double)cd2.position.y) + ((1 - t) * (double)cd1.position.y);
 		pos.position.z = (t * (double)cd2.position.z) + ((1 - t) * (double)cd1.position.z);
 		pos.pitch = (t * cd2.pitch) + ((1 - t) * cd1.pitch);
-		
-		pos.yaw = (t * cd2.yaw) + ((1 - t) * cd1.yaw);
-		cout << pos.yaw << endl;
-		//pos.pitch = cd1.pitch;
-		//pos.yaw = cd1.yaw;
+		pos.yaw = LerpDegrees(cd1.yaw, cd2.yaw, t);
 
 		countFrame++;
 		setData(pos);
@@ -99,4 +95,21 @@ CameraEffects Camera::moveCameraAuto(float msec)
 		currentTime = 0;
 	}
 	return effects;
+}
+
+float Camera::LerpDegrees(float start, float end, float amount)
+{
+	float difference = abs(end - start);
+	if (difference > 180) {
+		if (end > start) {
+			start += 360;
+		} else {
+			end += 360;
+		}
+	}
+	float value = (start + ((end - start) * amount));
+	float rangeZero = 360;
+	if (value >= 0 && value <= 360)
+		return value;
+	return fmod(value, rangeZero);
 }
