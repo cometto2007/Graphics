@@ -33,5 +33,4 @@ private:
 	float maxHeight;
 
 	Loader loader = Loader::getInstance();
-	
 };

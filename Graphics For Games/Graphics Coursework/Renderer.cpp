@@ -3,7 +3,7 @@
 
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	root = new Landscape();
-	camera = new Camera({ -7.86, 355.75, Vector3(5344, 8476, 74991) });
+	camera = new Camera({ -38.94, 357.57, Vector3(8073, 8476, 19475) });
 
 	quadPost = Mesh::GenerateQuad();
 	rainDrop = Mesh::GenerateQuad();
@@ -58,13 +58,13 @@ void Renderer::RenderScene() {
 		if (isSplitScreen) DrawSplitScreenScene();
 		else DrawCombinedScene();
 	}
+	cout << camera->getCameraIndex() << endl;
 	SwapBuffers();
 }
 
 void Renderer::UpdateScene(float msec) {
 	// TODO: add if
 	camera->UpdateCamera(msec);
-	//camera2->UpdateCamera(msec);
 	if (camera->getAutoCam()) {
 		CameraEffects effects = camera->moveCameraAuto(msec);
 		if (effects.isBlur != this->isBlur) {
@@ -72,9 +72,16 @@ void Renderer::UpdateScene(float msec) {
 		}
 		if (effects.isSplitScreen != this->isSplitScreen) {
 			this->toggleSplitScreen();
+			if (effects.isSplitScreen) {
+				setCameraAuto(camera2, true);
+			} else {
+				setCameraAuto(camera2, false);
+			}
+		}
+		if (effects.isSplitScreen) {
+			camera2->moveCameraAuto(msec);
 		}
 	}
-	//camera2->moveCameraAuto(msec);
 	viewMatrix = camera->BuildViewMatrix();
 	root->Update(msec);
 }
@@ -99,7 +106,6 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			if (!isShadow) SetCurrentShader(node->GetShader());
 			else SetCurrentShader(node->GetShadowShader());
 			SetShaderLight(*light);
-			
 			
 			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
@@ -126,6 +132,18 @@ void Renderer::moveLight(float x, float y, float z)
 	Vector3 pos = light->GetPosition();
 	light->SetPosition({pos.x + x, pos.y + y, pos.z + z});
 	cout << light->GetPosition() << endl;
+}
+
+void Renderer::activateSlideshow(bool active)
+{
+	if (!active) {
+		isBlur = false;
+		isSplitScreen = false;
+	} else {
+		camera->setCameraIndex(0);
+	}
+	camera->setAutoCam(active);
+	
 }
 
 void Renderer::configurePostProcessing()
@@ -217,7 +235,7 @@ void Renderer::DrawCombinedScene() {
 
 void Renderer::DrawSplitScreenScene()
 {
-	//viewMatrix = camera2->BuildViewMatrix();
+	viewMatrix = camera2->BuildViewMatrix();
 	glViewport(0, 0, width, height / 2);
 	DrawCombinedScene();
 
@@ -229,6 +247,7 @@ void Renderer::DrawSplitScreenScene()
 void Renderer::DrawPostProcess()
 {
 	glViewport(0, 0, width, height);
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, processFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -275,19 +294,27 @@ void Renderer::configureCameraPositions()
 {
 	camera->addCameraConf({ { -15.77, 5, Vector3(5376, 8476, 77322) }, {0.5, false, false} });
 	camera->addCameraConf({ { -7.86, 355.75, Vector3(5344, 8476, 74991) }, {40, true, false} });
-	camera->addCameraConf({ { -38.94, 357.57, Vector3(8073, 8476, 19475) }, {1, false, false} });
-	camera->addCameraConf({ { -47.76, 65.96, Vector3(16887, 8476, 13162) }, {1, false, false} });
-	camera->addCameraConf({ { -40.27, 128.75, Vector3(17825, 8476, 2022) }, {1, false, false} });
-	camera->addCameraConf({ { -35.79, 210.58, Vector3(547, 8476, -2025) }, {1, false, false} });
+	camera->addCameraConf({ { -38.94, 357.57, Vector3(8073, 8476, 19475) }, {1, false, true} });
+	camera->addCameraConf({ { -47.76, 65.96, Vector3(16887, 8476, 13162) }, {1, false, true} });
+	camera->addCameraConf({ { -40.27, 128.75, Vector3(17825, 8476, 2022) }, {1, false, true} });
+	camera->addCameraConf({ { -35.79, 210.58, Vector3(547, 8476, -2025) }, {1, false, true} });
 	camera->addCameraConf({ { -43.00, 305.57, Vector3(-1588, 8476, 14765) }, {1, false, false} });
 	camera->addCameraConf({ { -41.54, 0.58, Vector3(8034, 11979, 21759) }, {1, false, false} });
 
-	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 2252.96f), Vector3(8034, 11979, 21759) );
-	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 3000.0f), Vector3(1295.94f, 6551.4f, 2252.96f));
-	//camera->addCameraConf2(Vector3(1295.94f, 6551.4f, 3000.0f), Vector3(-2100, 3300, 2000));
-
-	/*camera2 = new Camera({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
-	camera2->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });
-	camera2->addCameraConf({ -40, 270, Vector3(-2100, 3300, 2000) });
-	camera2->addCameraConf({ -83.0499f, 270.07f, Vector3(1295.94f, 6551.4f, 2252.96f) });*/
+	camera2 = new Camera({ -17.80f, 318.86f, Vector3(874, 1961, 14681) });
+	camera2->addCameraConf({ { -17.80f, 318.86f, Vector3(874, 1961, 14681) }, {1, false, false} });
+	camera2->addCameraConf({ { -17.24f, 317.95f, Vector3(8136, 1961, 6629) }, {1, false, false} });
+	camera2->addCameraConf({ { -9.61, 201.06, Vector3(5214, 1961, 3295) }, {1, false, false} });
+	camera2->addCameraConf({ { -10.10, 264.62, Vector3(1941, 1961, 10084) }, {1, false, false} });
+	camera2->addCameraConf({ { -5.34, 358.91, Vector3(7579, 1961, 14455) }, {1, false, false} });
+	camera2->addCameraConf({ { -17.80f, 318.86f, Vector3(874, 1961, 14681) }, {1, false, false} });
+	camera2->addCameraConf({ { -17.24f, 317.95f, Vector3(8136, 1961, 6629) }, {1, false, false} });
+	camera2->addCameraConf({ { -9.61, 201.06, Vector3(5214, 1961, 3295) }, {1, false, false} });
+	camera2->addCameraConf({ { -10.10, 264.62, Vector3(1941, 1961, 10084) }, {1, false, false} });
+	camera2->addCameraConf({ { -5.34, 358.91, Vector3(7579, 1961, 14455) }, {1, false, false} });
+	camera2->addCameraConf({ { -17.80f, 318.86f, Vector3(874, 1961, 14681) }, {1, false, false} });
+	camera2->addCameraConf({ { -17.24f, 317.95f, Vector3(8136, 1961, 6629) }, {1, false, false} });
+	camera2->addCameraConf({ { -9.61, 201.06, Vector3(5214, 1961, 3295) }, {1, false, false} });
+	camera2->addCameraConf({ { -10.10, 264.62, Vector3(1941, 1961, 10084) }, {1, false, false} });
+	camera2->addCameraConf({ { -5.34, 358.91, Vector3(7579, 1961, 14455) }, {1, false, false} });
 }

@@ -46,10 +46,8 @@ void Camera::UpdateCamera(float msec)	{
 	if(Window::GetKeyboard()->KeyDown(KEYBOARD_SPACE)) {
 		position.y -= msec;
 	}
-	 /*
-	cout << "position: " << position << endl;
-	cout << "yaw: " << yaw << endl;
-	cout << "pitch: " << pitch << endl;*/
+	 
+	
 }
 
 /*
@@ -72,7 +70,6 @@ CameraEffects Camera::moveCameraAuto(float msec)
 	CameraData pos;
 	double distance = (cd1.position - cd2.position).Length();
 	double time = distance / effects.speed;
-	static double currentTime = 0;
 	currentTime += msec;
 
 	if (currentTime <= time) {

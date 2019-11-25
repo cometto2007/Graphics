@@ -1,17 +1,5 @@
 #include "Renderer.h"
 
-void Renderer::GLClearError() {
-	while (glGetError() != GL_NO_ERROR);
-}
-
-bool Renderer::GLLogCall(const char* function, const char* file, int line) {
-	while (GLenum error = glGetError()) {
-		cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
-		return false;
-	}
-	return true;
-}
-
 Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	CubeRobot::CreateCube();
 	camera = new Camera();

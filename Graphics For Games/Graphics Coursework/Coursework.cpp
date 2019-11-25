@@ -4,7 +4,7 @@
 #pragma comment(lib, "nclgl.lib")
 
 int main() {
-	Window w("Index Buffers!", 800, 600, false);
+	Window w("Index Buffers!", 1600, 1200, false);
 	if (!w.HasInitialised()) {
 		return -1;
 	}
@@ -18,17 +18,20 @@ int main() {
 	w.ShowOSPointer(true);
 
 	while (w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
+		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_0)) {
+			renderer.setCameraPosFromIndex(0);
+			renderer.activateSlideshow(true);
+		}
 		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_1)) {
-			renderer.setCameraConfsIndex(0);
-			renderer.setCameraAuto(false);
+			renderer.activateSlideshow(false);
+			renderer.setCameraPosFromIndex(1);
 		}
 		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_2)) {
-			renderer.setCameraConfsIndex(1);
-			renderer.setCameraAuto(false);
+			renderer.activateSlideshow(false);
+			renderer.setCameraPosFromIndex(2);
 		}
-		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_0)) {
-			renderer.setCameraConfsIndex(0);
-			renderer.setCameraAuto(true);
+		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_2)) {
+			renderer.activateSlideshow(false);
 		}
 		if (Window::GetKeyboard()->KeyDown(KEYBOARD_LEFT)) {
 			renderer.moveLight(-100.0f, 0.0f, 0.0f);

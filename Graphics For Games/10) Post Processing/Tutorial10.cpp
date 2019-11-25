@@ -4,7 +4,7 @@
 #pragma comment(lib, "nclgl.lib")
 
 int main() {	
-	Window w("Post Processing!", 800,600,false);
+	Window w("Post Processing!", 800,600,true);
 	if(!w.HasInitialised()) {
 		return -1;
 	}
@@ -14,7 +14,7 @@ int main() {
 		return -1;
 	}
 
-	w.LockMouseToWindow(true);
+	w.LockMouseToWindow(false);
 	w.ShowOSPointer(false);
 
 	while(w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)){

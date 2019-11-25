@@ -7,7 +7,7 @@
 
 Landscape::Landscape()
 {
-	terrain = new Terrain(0.5f, 3000.0f, 2000.0f);
+	terrain = new Terrain(0.5f, 3000.0f, 3000.0f);
 
 	Skybox* skyBox = new Skybox();
 	AddChild(skyBox);

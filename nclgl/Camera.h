@@ -39,9 +39,10 @@ public:
 	Camera(void){
 		yaw		= 0.0f;
 		pitch	= 0.0f;
-		cameraConfsIndex = -1;
+		cameraConfsIndex = 0;
 		countFrame = 1;
 		autoMov = false;
+		currentTime = 0;
 	};
 
 	Camera(CameraData data) {
@@ -49,9 +50,10 @@ public:
 		this->yaw = data.yaw;
 		this->position = data.position;
 
-		cameraConfsIndex = -1;
+		cameraConfsIndex = 0;
 		countFrame = 1;
 		autoMov = false;
+		currentTime = 0;
 	}
 
 	Camera(float pitch, float yaw, Vector3 position){
@@ -59,9 +61,10 @@ public:
 		this->yaw		= yaw;
 		this->position	= position;
 
-		cameraConfsIndex = -1;
+		cameraConfsIndex = 0;
 		countFrame = 1;
 		autoMov = false;
+		currentTime = 0;
 	}
 
 	~Camera(void){};
@@ -115,6 +118,7 @@ protected:
 	float	yaw;
 	float	pitch;
 	Vector3 position;
+	double currentTime;
 
 	float LerpDegrees(float start, float end, float amount);
 

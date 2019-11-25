@@ -69,9 +69,9 @@ Loader::Loader()
 		return;
 	}
 
-	skyBox = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
-		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
-		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
+	skyBox = SOIL_load_OGL_cubemap(TEXTUREDIR"niceday2ft.tga", TEXTUREDIR"niceday2bk.tga",
+		TEXTUREDIR"niceday2up.tga", TEXTUREDIR"niceday2dn.tga",
+		TEXTUREDIR"niceday2rt.tga", TEXTUREDIR"niceday2lf.tga",
 		SOIL_LOAD_RGB,
 		SOIL_CREATE_NEW_ID, 0);
 }

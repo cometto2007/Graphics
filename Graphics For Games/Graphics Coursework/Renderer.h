@@ -25,14 +25,15 @@ public:
 	void toggleSplitScreen() { isSplitScreen = !isSplitScreen; };
 	void setPostPasses(int post_passes) { post_passes = post_passes; };
 
-	void setCameraConfsIndex(int i) { 
-		camera->setCameraIndex(i);
-		//camera2->setCameraIndex(i);
+	static void setCameraConfsIndex(Camera* cam, int i) { 
+		cam->setCameraIndex(i);
 	};
-	void setCameraAuto(bool b) { 
-		camera->setAutoCam(b);
-		//camera2->setAutoCam(b);
+	static void setCameraAuto(Camera* cam, bool b) {
+		cam->setAutoCam(b);
 	};
+
+	void activateSlideshow(bool active);
+	void setCameraPosFromIndex(int i) { camera->setCameraIndex(i); };
 	
 protected:
 	Loader loader = Loader::getInstance();

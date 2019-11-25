@@ -7,11 +7,6 @@
 #include "CubeRobot.h"
 #include <algorithm>
 
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-	x;\
-	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
-
 class Renderer :
 	public OGLRenderer {
 public:
@@ -20,9 +15,6 @@ public:
 
 	virtual void RenderScene();
 	virtual void UpdateScene(float msec);
-
-	bool GLLogCall(const char* function, const char* file, int line);
-	void GLClearError();
 
 protected:
 	void BuildNodeLists(SceneNode* from);
