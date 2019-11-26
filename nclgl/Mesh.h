@@ -18,6 +18,7 @@ public:
 	static Mesh* GenerateTriangle();
 	static Mesh* GenerateQuad();
 	static Mesh* GenerateCube();
+	static Mesh* GeneratePoint();
 
 	void* getColorBufferPointer();
 	void setTransformation(Matrix4& transform) {

@@ -6,13 +6,14 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	camera = new Camera({ -38.94, 357.57, Vector3(8073, 8476, 19475) });
 
 	quadPost = Mesh::GenerateQuad();
-	rainDrop = Mesh::GenerateQuad();
+	rainDrop = Mesh::GeneratePoint();
 	rainDrop->setTexture(loader.getWaterTex());
+	rain = new Rain();
 
 	isSplitScreen = false;
 	isBlur = false;
 	
-	light = new Light(Vector3(LIGHT_X, LIGHT_Y, LIGHT_Z), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.05f);
+	light = new Light(Vector3(23608, 11500, 15208), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.05f);
 	light2 = new Light(Vector3(-13792, 11500, -4092), Vector4(0.9f, 0.9f, 1.0f, 1), (RAW_WIDTH * HEIGHTMAP_X) / 0.5f);
 
 	configureShadow();
@@ -31,9 +32,17 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 
 Renderer::~Renderer(void) {
 	delete camera;
+	delete camera2;
+	delete root;
 	delete quadPost;
 	delete light;
+	delete light2;
+	delete rainDrop;
+	
 	currentShader = nullptr;
+
+	glDeleteTextures(1, &shadowTex);
+	glDeleteTextures(1, &shadowFBO);
 
 	glDeleteTextures(2, bufferColourTex);
 	glDeleteTextures(1, &bufferDepthTex);
@@ -43,6 +52,7 @@ Renderer::~Renderer(void) {
 
 void Renderer::RenderScene() {
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	BuildNodeLists(root);
 
 	DrawShadowScene();
 	if (isBlur) {
@@ -59,11 +69,12 @@ void Renderer::RenderScene() {
 		if (isSplitScreen) DrawSplitScreenScene();
 		else DrawCombinedScene();
 	}
+	transparentNodeList.clear();
+	nodeList.clear();
 	SwapBuffers();
 }
 
 void Renderer::UpdateScene(float msec) {
-	// TODO: add if
 	camera->UpdateCamera(msec);
 	if (camera->getAutoCam()) {
 		CameraEffects effects = camera->moveCameraAuto(msec);
@@ -76,6 +87,7 @@ void Renderer::UpdateScene(float msec) {
 				setCameraAuto(camera2, true);
 			} else {
 				setCameraAuto(camera2, false);
+				setCameraConfsIndex(camera2, 0);
 			}
 		}
 		if (effects.isSplitScreen) {
@@ -83,12 +95,15 @@ void Renderer::UpdateScene(float msec) {
 		}
 	}
 	viewMatrix = camera->BuildViewMatrix();
+	frameFrustum.FromMatrix(projMatrix * viewMatrix);
+	
 	root->Update(msec);
+	rain->Update(msec);
 }
 
 void Renderer::DrawRain()
 {
-	float heightX = (RAW_WIDTH * HEIGHTMAP_X);
+	/*float heightX = (RAW_WIDTH * HEIGHTMAP_X);
 	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z);
 
 	for (size_t i = 0; i < 1000; i++) {
@@ -96,7 +111,8 @@ void Renderer::DrawRain()
 			Matrix4::Scale(Vector3(5, 30, 20));
 		UpdateShaderMatrices();
 		rainDrop->Draw();
-	}
+	}*/
+	DrawNode(rain, false);
 }
 
 void Renderer::DrawNode(SceneNode* node, bool isShadow)
@@ -110,6 +126,34 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			
 			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)& camera->GetPosition());
+
+			for (int i = 0; i < node->getDrawingMesh(); i++) {
+				node->updateDrawing(i);
+				modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
+				textureMatrix = node->texture_matrix();
+				UpdateShaderMatrices();
+
+				Matrix4 tempMatrix = shadowMatrix * modelMatrix;
+				glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
+				BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", GetCurrentShader(), GL_TEXTURE_2D);
+				glUniform1f(glGetUniformLocation(GetCurrentShader()->GetProgram(), "height"), root->get_terrain()->getHeight());
+
+				node->Draw(*this);
+			}
+			
+		}
+	}
+}
+
+/*void Renderer::DrawNode(SceneNode* node)
+{
+	if (node->GetMesh() || node->getObjMesh()) {
+			SetCurrentShader(node->GetShader());
+			SetShaderLight(*light);
+			SetShaderLights2(*light, *light2);
+
+			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
 			textureMatrix = node->texture_matrix();
 			UpdateShaderMatrices();
@@ -118,14 +162,10 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
 			BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", GetCurrentShader(), GL_TEXTURE_2D);
 			glUniform1f(glGetUniformLocation(GetCurrentShader()->GetProgram(), "height"), root->get_terrain()->getHeight());
-			
+
 			node->Draw(*this);
-		}
 	}
-	for (vector<SceneNode*>::const_iterator i = node->getChildIteratorStart(); i != node->getChildIteratorEnd(); ++i) {
-		DrawNode(*i, isShadow);
-	}
-}
+}*/
 
 // TODO: delete
 void Renderer::moveLight(float x, float y, float z)
@@ -216,7 +256,8 @@ void Renderer::DrawShadowScene() {
 
 	UpdateShaderMatrices();
 	SetCurrentShader(loader.shadow_shader());
-	DrawNode(root, true);
+	//DrawNode(root, true);
+	DrawNodes(true);
 
 	viewMatrix = camera->BuildViewMatrix();
 	UpdateShaderMatrices();
@@ -228,8 +269,9 @@ void Renderer::DrawShadowScene() {
 }
 
 void Renderer::DrawCombinedScene() {
-	DrawNode(root, false);
-	SetCurrentShader(loader.post_process_shader());
+	//DrawNode(root, false);
+	DrawNodes(false);
+	SetCurrentShader(loader.rain_shader());
 	DrawRain();
 	glUseProgram(0);
 }
@@ -291,11 +333,44 @@ void Renderer::PresentScene()
 	glUseProgram(0);
 }
 
+void Renderer::BuildNodeLists(SceneNode* from)
+{
+	if (frameFrustum.InsideFrustum(*from)) {
+		Vector3 dir = from->GetWorldTransform().GetPositionVector() - camera->GetPosition();
+		from->SetCameraDistance(Vector3::Dot(dir, dir));
+
+		if (from->getIsTransparent()) {
+			transparentNodeList.push_back(from);
+		} else {
+			nodeList.push_back(from);
+		}
+	}
+	for (vector<SceneNode*>::const_iterator i = from->getChildIteratorStart(); i != from->getChildIteratorEnd(); ++i) {
+		BuildNodeLists((*i));
+	}
+}
+
+void Renderer::SortNodeLists()
+{
+	std::sort(transparentNodeList.begin(), transparentNodeList.end(), SceneNode::CompareByCameraDistance);
+	std::sort(nodeList.begin(), nodeList.end(), SceneNode::CompareByCameraDistance);
+}
+
+void Renderer::DrawNodes(bool isShadow)
+{
+	for (vector<SceneNode*>::const_iterator i = nodeList.begin(); i != nodeList.end(); ++i) {
+		DrawNode((*i), isShadow);
+	}
+	for (vector<SceneNode*>::const_reverse_iterator i = transparentNodeList.rbegin(); i != transparentNodeList.rend(); ++i) {
+		DrawNode((*i), isShadow);
+	}
+}
+
 void Renderer::configureCameraPositions()
 {
-	camera->addCameraConf({ { -15.77, 5, Vector3(5376, 8476, 77322) }, {0.5, false, false} });
+	camera->addCameraConf({ { -15.77, 5, Vector3(5376, 8476, 77322) }, {0.2, false, false} });
 	camera->addCameraConf({ { -7.86, 355.75, Vector3(5344, 8476, 74991) }, {40, true, false} });
-	camera->addCameraConf({ { -38.94, 357.57, Vector3(8073, 8476, 19475) }, {1, false, true} });
+	camera->addCameraConf({ { -38.94, 357.57, Vector3(8073, 8476, 19475) }, {1, false, false} });
 	camera->addCameraConf({ { -47.76, 65.96, Vector3(16887, 8476, 13162) }, {1, false, true} });
 	camera->addCameraConf({ { -40.27, 128.75, Vector3(17825, 8476, 2022) }, {1, false, true} });
 	camera->addCameraConf({ { -35.79, 210.58, Vector3(547, 8476, -2025) }, {1, false, true} });

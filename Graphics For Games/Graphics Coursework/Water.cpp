@@ -13,6 +13,7 @@ Water::Water(GLuint cubeMap)
 
 Water::~Water()
 {
+	glDeleteTextures(1, &cubeMap);
 }
 
 void Water::Update(float msec)

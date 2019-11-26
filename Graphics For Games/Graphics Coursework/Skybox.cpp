@@ -8,6 +8,11 @@ Skybox::Skybox()
 	shadowShader = nullptr;
 }
 
+Skybox::~Skybox()
+{
+	glDeleteTextures(1, &cubeMap);
+}
+
 void Skybox::Draw(const OGLRenderer& r)
 {
 	glDepthMask(GL_FALSE);

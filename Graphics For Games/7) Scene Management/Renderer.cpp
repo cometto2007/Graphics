@@ -81,9 +81,6 @@ void Renderer::DrawNode(SceneNode* n)
 		glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "useTexture"), (int)(n->GetMesh()->GetTexture()));
 		n->Draw(*this);
 	}
-	for (vector<SceneNode*>::const_iterator i = n->getChildIteratorStart(); i != n->getChildIteratorEnd(); ++i) {
-		DrawNode(*i);
-	}
 }
 
 void Renderer::BuildNodeLists(SceneNode* from)

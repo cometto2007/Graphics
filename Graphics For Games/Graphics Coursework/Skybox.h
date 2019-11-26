@@ -7,6 +7,7 @@ class Skybox :
 {
 public:
 	Skybox();
+	~Skybox();
 
 
 	void Draw(const OGLRenderer& r) override;

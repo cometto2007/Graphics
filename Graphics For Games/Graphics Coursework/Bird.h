@@ -9,7 +9,8 @@ class Bird :
 {
 public:
 	Bird(const MD5FileData& ofType, float speed);
-
+	~Bird() {};
+	
 	virtual void Draw(const OGLRenderer& r);
 	virtual void Update(float msec);
 

@@ -174,6 +174,19 @@ Mesh* Mesh::GenerateCube()
 	return m;
 }
 
+Mesh* Mesh::GeneratePoint()
+{
+	Mesh* m = new Mesh();
+	m->numVertices = 1;
+	m->type = GL_POINTS;
+
+	m->vertices = new Vector3[m->numVertices];
+	m->vertices[0] = Vector3(0.0f, 0.0f, 0.0f);
+	
+	m->BufferData();
+	return m;
+}
+
 void* Mesh::getColorBufferPointer()
 {
 	void* p = nullptr;

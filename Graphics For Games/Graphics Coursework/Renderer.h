@@ -1,12 +1,13 @@
 #pragma once
+#include "../../nclgl/Frustum.h"
 #include "../../nclgl/Camera.h"
 #include "Landscape.h"
 #include "Loader.h"
 
+#include <algorithm>
+#include "Rain.h"
+
 #define SHADOWSIZE 2048
-#define LIGHT_X 23108
-#define LIGHT_Y 11500
-#define LIGHT_Z 15208
 
 class Renderer : public OGLRenderer {
 public:
@@ -33,7 +34,11 @@ public:
 	};
 
 	void activateSlideshow(bool active);
-	void setCameraPosFromIndex(int i) { camera->setCameraIndex(i); };
+	void setCameraPosFromIndex(int i)
+	{
+		camera->setCameraIndex(i);
+		camera2->setCameraIndex(0);
+	};
 	
 protected:
 	Loader loader = Loader::getInstance();
@@ -46,12 +51,19 @@ protected:
 	Light* light;
 	Light* light2;
 
+	Rain* rain;
+
 	GLuint shadowTex;
 	GLuint shadowFBO;
 	GLuint bufferDepthTex;
 	GLuint bufferColourTex[2];
 	GLuint bufferFBO;
 	GLuint processFBO;
+
+	Frustum frameFrustum;
+
+	vector<SceneNode*> transparentNodeList;
+	vector<SceneNode*> nodeList;
 
 	bool isSplitScreen;
 	bool isBlur;
@@ -62,8 +74,13 @@ protected:
 	void DrawSplitScreenScene();
 	void PresentScene();
 	void DrawPostProcess();
-
 	void DrawNode(SceneNode* n, bool isShadow);
+	//void DrawNode(SceneNode* n);
+
+	void BuildNodeLists(SceneNode* from);
+	void SortNodeLists();
+	void ClearNodeLists();
+	void DrawNodes(bool isShadow);
 
 	void configureShadow();
 	void configurePostProcessing();

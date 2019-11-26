@@ -39,6 +39,12 @@ public:
 	float GetCameraDistance() const { return distanceFromCamera; }
 	void SetCameraDistance(float f) { distanceFromCamera = f; }
 
+	bool getIsTransparent() { return isTransparent; };
+	void setIsTransparent(bool isTransp) { isTransparent = isTransp; };
+
+	int getDrawingMesh() { return drawingMesh; };
+	void setDrawingMesh(int drawingMesh) { this->drawingMesh = drawingMesh; };
+
 	static bool CompareByCameraDistance(SceneNode* a, SceneNode* b) {
 		return (a->distanceFromCamera < b->distanceFromCamera) ? true : false;
 	}
@@ -47,6 +53,7 @@ public:
 
 	virtual void Update(float msec);
 	virtual void Draw(const OGLRenderer& r);
+	virtual void updateDrawing(int i) {};
 
 	std::vector<SceneNode*>::const_iterator getChildIteratorStart() { return children.begin(); }
 	std::vector<SceneNode*>::const_iterator getChildIteratorEnd() { return children.end(); }
@@ -75,9 +82,12 @@ protected:
 	Shader* shadowShader;
 	std::vector<SceneNode*> children;
 
+	int drawingMesh;
+
 	Matrix4 textureMatrix;
 
 	float distanceFromCamera;
 	float boundingRadius;
+	bool isTransparent;
 
 };

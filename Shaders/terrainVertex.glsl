@@ -13,5 +13,5 @@ in vec3 position;
 
 void main(void) {
 	vec4 texel = texture(deptTex, position.xz / (32.0 * 513));
-	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, position.y + (texel.r * height), position.z, 1.0);
+	gl_Position = (projMatrix * viewMatrix * modelMatrix) * vec4(position.x, position.y + min(texel.r * height, height), position.z, 1.0);
 }

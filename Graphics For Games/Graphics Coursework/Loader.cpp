@@ -48,6 +48,7 @@ Loader::Loader()
 	calcShadowGrassField = new Shader(SHADERDIR "shadowGrassFieldVert.glsl", SHADERDIR "shadowGrassFieldFrag.glsl");
 
 	postProcessShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_texturedFragment.glsl");
+	rainShader = new Shader(SHADERDIR "RainTexturedVertex.glsl", SHADERDIR "RainTexturedFragment.glsl", SHADERDIR"RainTexturedGeometry.glsl");
 	processShader = new Shader(SHADERDIR "t10_texturedVertex.glsl", SHADERDIR "t10_processfrag.glsl");
 	animationShader = new Shader(SHADERDIR"skeletonvertex.glsl", SHADERDIR"TexturedFragment.glsl");
 	birdShadowShader = new Shader(SHADERDIR"birdShadowVertex.glsl", SHADERDIR"birdShadowFragment.glsl");
@@ -66,7 +67,8 @@ Loader::Loader()
 		!postProcessShader->LinkProgram() ||
 		!animationShader->LinkProgram() ||
 		!birdShadowShader->LinkProgram() ||
-		!doubleLightShader->LinkProgram()) {
+		!doubleLightShader->LinkProgram() ||
+		!rainShader->LinkProgram()) {
 		return;
 	}
 
@@ -77,9 +79,48 @@ Loader::Loader()
 		SOIL_CREATE_NEW_ID, 0);
 }
 
+
 void Loader::SetTextureRepeating(GLuint target, bool repeating) {
 	glBindTexture(GL_TEXTURE_2D, target);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Loader::Destroy()
+{
+	delete tree;
+	delete lightShader;
+	delete reflectShader;
+	delete skyboxShader;
+	delete testShader;
+	delete shadowShader;
+	delete sceneShader;
+	delete test1Shader;
+	delete sceneNodeShadowShader;
+	delete calcShadowGrassField;
+	delete processShader;
+	delete postProcessShader;
+	delete birdShadowShader;
+	delete animationShader;
+	delete doubleLightShader;
+
+	glDeleteTextures(1, &grassTex);
+	glDeleteTextures(1, &barkTex);
+	glDeleteTextures(1, &deptMap);
+	glDeleteTextures(1, &grassMap);
+	glDeleteTextures(1, &cliffsMap);
+	glDeleteTextures(1, &sandWetMap);
+	glDeleteTextures(1, &sandMap);
+	glDeleteTextures(1, &bumpMap);
+	glDeleteTextures(1, &skyBox);
+	glDeleteTextures(1, &cliffsTex);
+	glDeleteTextures(1, &sandWetTex);
+	glDeleteTextures(1, &sandTex);
+	glDeleteTextures(1, &groundTex);
+	glDeleteTextures(1, &waterTex);
+	glDeleteTextures(1, &grassBumpMap);
+	glDeleteTextures(1, &cliffsBumpMap);
+
+	delete birdData;
 }

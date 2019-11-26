@@ -35,6 +35,8 @@ void main(void) {
 	if (IN.discardFrag > 0.5) {
 		discard;
 	}
+
+
 	vec4 diffuse = texture(diffuseTex, IN.texCoord);
 	mat3 TBN = mat3(IN.tangent, IN.binormal, IN.normal);
 	vec3 normal = normalize(TBN * (texture(bumpTex, IN.texCoord).rgb * 2.0 - 1.0));

@@ -11,6 +11,7 @@ public:
 		static Loader instance; 
 		return instance;
 	}
+	
 	MD5FileData* getBirdData(){ return birdData; }
 	OBJMesh* getTree() { return tree; };
 	GLuint getGrassTex() { return grassTex; };
@@ -43,6 +44,9 @@ public:
 	Shader* bird_shadow_shader() const { return birdShadowShader; }
 	Shader* animation_shader() const { return animationShader; }
 	Shader* double_light_shader() const { return doubleLightShader; }
+	Shader* rain_shader() const { return rainShader; }
+
+	void Destroy();
 	
 
 private:
@@ -64,6 +68,7 @@ private:
 	Shader* birdShadowShader;
 	Shader* animationShader;
 	Shader* doubleLightShader;
+	Shader* rainShader;
 
 	GLuint grassTex;
 	GLuint barkTex;
