@@ -20,8 +20,6 @@ public:
 	virtual void RenderScene();
 	virtual void UpdateScene(float msec);
 
-	void moveLight(float x, float y, float z);
-
 	void toggleBlur() { isBlur = !isBlur; };
 	void toggleSplitScreen() { isSplitScreen = !isSplitScreen; };
 	void setPostPasses(int post_passes) { post_passes = post_passes; };
@@ -46,7 +44,6 @@ protected:
 	
 	Camera* camera;
 	Camera* camera2;
-	Mesh* rainDrop;
 	Mesh* quadPost;
 	Light* light;
 	Light* light2;
@@ -68,14 +65,12 @@ protected:
 	bool isSplitScreen;
 	bool isBlur;
 
-	void DrawRain();
 	void DrawShadowScene();
 	void DrawCombinedScene();
 	void DrawSplitScreenScene();
 	void PresentScene();
 	void DrawPostProcess();
 	void DrawNode(SceneNode* n, bool isShadow);
-	//void DrawNode(SceneNode* n);
 
 	void BuildNodeLists(SceneNode* from);
 	void SortNodeLists();

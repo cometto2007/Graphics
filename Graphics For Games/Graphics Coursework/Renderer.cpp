@@ -6,8 +6,6 @@ Renderer::Renderer(Window& parent) : OGLRenderer(parent) {
 	camera = new Camera({ -38.94, 357.57, Vector3(8073, 8476, 19475) });
 
 	quadPost = Mesh::GenerateQuad();
-	rainDrop = Mesh::GeneratePoint();
-	rainDrop->setTexture(loader.getWaterTex());
 	rain = new Rain();
 
 	isSplitScreen = false;
@@ -37,7 +35,6 @@ Renderer::~Renderer(void) {
 	delete quadPost;
 	delete light;
 	delete light2;
-	delete rainDrop;
 	
 	currentShader = nullptr;
 
@@ -101,20 +98,6 @@ void Renderer::UpdateScene(float msec) {
 	rain->Update(msec);
 }
 
-void Renderer::DrawRain()
-{
-	/*float heightX = (RAW_WIDTH * HEIGHTMAP_X);
-	float heightZ = (RAW_HEIGHT * HEIGHTMAP_Z);
-
-	for (size_t i = 0; i < 1000; i++) {
-		modelMatrix = Matrix4::Translation(Vector3(Utility::RandomFloat(-heightX, heightX), Utility::RandomFloat(0, 10000.0f), Utility::RandomFloat(-heightZ, heightZ))) *
-			Matrix4::Scale(Vector3(5, 30, 20));
-		UpdateShaderMatrices();
-		rainDrop->Draw();
-	}*/
-	DrawNode(rain, false);
-}
-
 void Renderer::DrawNode(SceneNode* node, bool isShadow)
 {
 	if (node->GetMesh() || node->getObjMesh()) {
@@ -143,36 +126,6 @@ void Renderer::DrawNode(SceneNode* node, bool isShadow)
 			
 		}
 	}
-}
-
-/*void Renderer::DrawNode(SceneNode* node)
-{
-	if (node->GetMesh() || node->getObjMesh()) {
-			SetCurrentShader(node->GetShader());
-			SetShaderLight(*light);
-			SetShaderLights2(*light, *light2);
-
-			glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
-			glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
-			modelMatrix = node->GetWorldTransform() * Matrix4::Scale(node->GetModelScale());
-			textureMatrix = node->texture_matrix();
-			UpdateShaderMatrices();
-
-			Matrix4 tempMatrix = shadowMatrix * modelMatrix;
-			glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "shadowMatrix"), 1, false, *&tempMatrix.values);
-			BindTextureToSamplerAndUniform(11, shadowTex, "shadowTex", GetCurrentShader(), GL_TEXTURE_2D);
-			glUniform1f(glGetUniformLocation(GetCurrentShader()->GetProgram(), "height"), root->get_terrain()->getHeight());
-
-			node->Draw(*this);
-	}
-}*/
-
-// TODO: delete
-void Renderer::moveLight(float x, float y, float z)
-{
-	Vector3 pos = light->GetPosition();
-	light->SetPosition({pos.x + x, pos.y + y, pos.z + z});
-	cout << light->GetPosition() << endl;
 }
 
 void Renderer::activateSlideshow(bool active)
@@ -256,7 +209,6 @@ void Renderer::DrawShadowScene() {
 
 	UpdateShaderMatrices();
 	SetCurrentShader(loader.shadow_shader());
-	//DrawNode(root, true);
 	DrawNodes(true);
 
 	viewMatrix = camera->BuildViewMatrix();
@@ -269,10 +221,9 @@ void Renderer::DrawShadowScene() {
 }
 
 void Renderer::DrawCombinedScene() {
-	//DrawNode(root, false);
 	DrawNodes(false);
 	SetCurrentShader(loader.rain_shader());
-	DrawRain();
+	DrawNode(rain, false);
 	glUseProgram(0);
 }
 

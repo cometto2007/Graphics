@@ -4,7 +4,7 @@
 #pragma comment(lib, "nclgl.lib")
 
 int main() {
-	Window w("Index Buffers!", 1600, 1200, true);
+	Window w("Index Buffers!", 1200, 800, false);
 	if (!w.HasInitialised()) {
 		return -1;
 	}
@@ -14,8 +14,8 @@ int main() {
 		return -1;
 	}
 
-	w.LockMouseToWindow(true);
-	w.ShowOSPointer(true);
+	w.LockMouseToWindow(false);
+	w.ShowOSPointer(false);
 
 	renderer.setCameraPosFromIndex(0);
 	renderer.activateSlideshow(true);
@@ -35,28 +35,7 @@ int main() {
 		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_9)) {
 			renderer.activateSlideshow(false);
 		}
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_LEFT)) {
-			renderer.moveLight(-100.0f, 0.0f, 0.0f);
-		}
 
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_RIGHT)) {
-			renderer.moveLight(100.0f, 0.0f, 0.0f);
-		}
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_UP)) {
-			renderer.moveLight(0.0f, 0.0f, 100.0f);
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_DOWN)) {
-			renderer.moveLight(0.0f, 0.0f, -100.0f);
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_U)) {
-			renderer.moveLight(0.0f, 100.0f, 0.0f);
-		}
-
-		if (Window::GetKeyboard()->KeyDown(KEYBOARD_J)) {
-			renderer.moveLight(0.0f, -100.0f, 0.0f);
-		}
 		renderer.UpdateScene(w.GetTimer()->GetTimedMS());
 		renderer.RenderScene();
 	}
